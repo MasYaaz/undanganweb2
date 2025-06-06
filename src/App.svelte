@@ -6,6 +6,7 @@
   import { faEnvelopeOpen } from "@fortawesome/free-regular-svg-icons";
   import {
     faCalendarAlt,
+    faCheck,
     faPaperPlane,
   } from "@fortawesome/free-solid-svg-icons";
   import Flipcard from "./lib/Flipcard.svelte";
@@ -15,6 +16,7 @@
   let hasEntered = false; // Variabel untuk menunjukkan halaman utama
   let showHero = true;
   let initialLoad = true;
+  let selected='Ya';
 
   let activeSection = "section2";
   const sections = ["section2", "section3", "section4", "section5"];
@@ -397,7 +399,9 @@
         id="section4"
         class="relative flex min-h-screen items-center justify-center bg-gradient-to-br p-15 px-4"
       >
-        <div class="relative flex flex-col justify-center z-10 text-center">
+        <div
+          class="relative flex flex-col justify-center z-10 lg:pt-10 text-center"
+        >
           <FontAwesomeIcon icon={faCalendarAlt} size="5x" class="fa-5x mb-5" />
           <div class="lg:mb-20">
             <h2
@@ -450,11 +454,13 @@
         on:touchend={handleTouchEnd}
       >
         <div class="relative mb-10 lg:mb-20 px-4 text-center">
-          <h2 class="text-4xl font-extrabold text-pink-700 sm:text-5xl">
+          <h2
+            class="text-4xl font-extrabold text-pink-700 sm:text-7xl uppercase tracking-wider"
+          >
             Galeri
           </h2>
-          <p class="mt-2 text-base text-pink-600 sm:text-lg">
-            Geser untuk melihat momen spesial
+          <p class="mt-2 text-lg text-pink-600 lg:text-xl">
+            Geser untuk melihat momen momen spesial!
           </p>
         </div>
 
@@ -505,7 +511,7 @@
         >
           <div class="mb-6 text-center">
             <h2
-              class="font-cinzeldeco text-7xl font-bold text-pink-700 lg:text-8xl"
+              class="font-poppins uppercase text-7xl font-bold text-pink-700 lg:text-8xl"
             >
               rsvp
             </h2>
@@ -522,40 +528,54 @@
           >
             <!-- Input Nama -->
             <div>
-              <label for="nama" class="block text-sm font-medium text-gray-700"
+              <label
+                for="nama"
+                class="block text-sm font-medium text-gray-700 font-poppins"
                 >Nama</label
               >
               <input
                 type="text"
                 id="nama"
                 name="Nama"
-                class="mt-1 w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none"
+                class="mt-1 w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none font-poppins"
                 placeholder="Masukkan nama Anda"
               />
             </div>
             <!-- Input Kehadiran -->
             <div>
-              <p class="mb-2 block text-sm font-medium text-gray-700">
+              <p
+                class="mb-2 block text-sm font-medium text-gray-700 font-poppins"
+              >
                 Apakah Anda akan hadir?
               </p>
               <div class="flex items-center space-x-6">
-                <label class="inline-flex items-center">
+                <label class="radio-wrapper hover:scale-102 transition-transform">
                   <input
                     type="radio"
                     name="Kehadiran"
                     value="Ya"
-                    class="text-pink-600 focus:ring-pink-500"
+                    class="custom-radio"
+                    bind:group={selected}
                   />
-                  <span class="ml-2 text-gray-700">Ya, saya akan hadir</span>
+                  <span class="icon-wrapper">
+                    <FontAwesomeIcon icon={faCheck}/>
+                  </span>
+                  <span class="ml-2 text-gray-700 font-poppins"
+                    >Ya, saya akan hadir</span
+                  >
                 </label>
-                <label class="inline-flex items-center">
+                <label class="radio-wrapper hover:scale-102 transition-transform">
                   <input
                     type="radio"
                     name="Kehadiran"
                     value="Tidak"
-                    class="text-pink-600 focus:ring-pink-500"
+                    class="custom-radio"
+                    bind:group={selected}
                   />
-                  <span class="ml-2 text-gray-700"
+                  <span class="icon-wrapper">
+                    <FontAwesomeIcon icon={faCheck}/>
+                  </span>
+                  <span class="ml-2 text-gray-700 font-poppins"
                     >Maaf, saya tidak bisa hadir</span
                   >
                 </label>
@@ -597,9 +617,12 @@
             <div class="text-center flex justify-center">
               <button
                 type="submit"
-                class="w-content rounded-full flex items-center justify-center bg-pink-600 px-8 py-3 text-white shadow-md transition-transform hover:scale-105 hover:cursor-pointer hover:bg-pink-700 focus:outline-none"
+                class="gap-2 w-content rounded-full flex items-center justify-center bg-pink-600 px-8 py-3 text-white shadow-md transition-transform hover:scale-105 hover:cursor-pointer hover:bg-pink-700 focus:outline-none"
               >
-                Kirim <FontAwesomeIcon icon={faPaperPlane} class="fa-md rotate-12" />
+                Kirim <FontAwesomeIcon
+                  icon={faPaperPlane}
+                  class="fa-md rotate-12"
+                />
               </button>
             </div>
           </form>
@@ -618,4 +641,49 @@
   .hidden-slide {
     transform: translateY(-100%);
   }
+
+  /* Custom radio */
+.radio-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.custom-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 0px;
+  height: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.custom-radio:checked + .icon-wrapper{
+  visibility: visible;
+  color: red;
+}
+
+.icon-wrapper {
+  visibility: visible; /* sembunyikan tapi tetap ambil ruang */
+  color: grey;
+  font-size: 16px;
+  pointer-events: none;
+  width: 16px;       /* atur lebar tetap */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0;
+}
+
+.icon {
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 </style>
