@@ -499,6 +499,7 @@
                 <img
                   src={img}
                   alt={`Foto ${i + 1}`}
+                  loading="lazy"
                   class={`cursor-pointer rounded-xl object-cover transition-all duration-500
               ${
                 i === activeIndex
