@@ -7,10 +7,13 @@
   import {
     faCalendarAlt,
     faCheck,
+    faMosque,
     faPaperPlane,
+    faPlaceOfWorship,
   } from "@fortawesome/free-solid-svg-icons";
   import Flipcard from "./lib/Flipcard.svelte";
   import "./app.css";
+  import "leaflet/dist/leaflet.css";
 
   let targetSection: HTMLDivElement;
   let hasEntered = false; // Variabel untuk menunjukkan halaman utama
@@ -86,9 +89,11 @@
       hari: "Sabtu",
       tanggal: "15 Juni 2025",
       waktu: "09.00 - Selesai",
-      tempat: "Masjid Baitul Iman",
-      alamat: "Jl.Kemlaten IV No.20",
-    },
+      tempat: "Masjid Al-Akbar Surabaya",
+      alamat: "Jl. Masjid Al-Akbar Timur No.1, Pagesangan, Kec. Jambangan, Surabaya, Jawa Timur 60274, Indonesia",
+      logo: faMosque,
+      alamatMap: "Masjid Al Akbar Surabaya"
+      },
     {
       judulCinzel: "Resepsi nikah",
       srcImage:
@@ -96,9 +101,11 @@
       hari: "Sabtu",
       tanggal: "15 Juni 2025",
       waktu: "20.00 - Selesai",
-      tempat: "Rumah Mempelai Wanita",
-      alamat: "Jl.Kemlaten IV No.50",
-    },
+      tempat: "Graha Adi",
+      alamat: "Jl. Balas Klumprik No.156, Balas Klumprik, Kec. Wiyung, Surabaya, Jawa Timur 60222, Indonesia",
+      logo: faPlaceOfWorship,
+      alamatMap: "Graha Adi"
+      },
   ];
 
   function observeSections() {
@@ -258,7 +265,7 @@
         >
           <!-- Paragraf atas -->
           <h3
-            class="font-jane mt-0 mb-0 text-lg font-medium text-black md:mt-2 md:mb-3 md:text-3xl"
+            class="font-jane mt-4 mb-0 text-lg font-medium text-black md:mt-2 md:mb-3 md:text-3xl"
           >
             - Wedding Invitation -
           </h3>
@@ -276,8 +283,9 @@
 
           <!-- Kotak gambar tengah -->
           <div
-            class="my-6 h-60 w-60 overflow-hidden rounded-t-[100px] border-4 border-pink-200 shadow-lg md:h-80 md:w-80"
-          ></div>
+            class="my-6 h-content w-80 overflow-hidden rounded-t-[100px] md:h-content md:w-100">
+            <img src="/images/duo.png" alt="foto berdua">
+          </div>
 
           <!-- Paragraf bawah -->
           <h3
@@ -356,8 +364,10 @@
             <div class="flex flex-col items-center">
               <!-- Kotak gambar -->
               <div
-                class="my-6 h-60 w-60 overflow-hidden rounded-t-[100px] border-4 border-pink-200 shadow-lg lg:h-80 lg:w-80"
-              ></div>
+                class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
+              >
+                <img src="/images/laki.png" alt="laki-laki">
+              </div>
               <h3 class="font-jane text-base md:text-lg">Muhammad bin Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
                 MuhammaD
@@ -370,8 +380,10 @@
             <div class="flex flex-col items-center">
               <!-- Kotak gambar -->
               <div
-                class="my-6 h-60 w-60 overflow-hidden rounded-t-[100px] border-4 border-pink-200 shadow-lg lg:h-80 lg:w-80"
-              ></div>
+                class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
+              >
+                <img src="/images/perempuan.png" alt="perempuan">
+              </div>
               <h3 class="font-jane text-lg">Aishah Binti Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
                 Aishah
@@ -440,6 +452,8 @@
                 waktu={item.waktu}
                 tempat={item.tempat}
                 alamat={item.alamat}
+                logo={item.logo}
+                alamatMap={item.alamatMap}
               />
             {/each}
           </div>
