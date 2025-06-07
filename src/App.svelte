@@ -41,7 +41,6 @@
   let touchStartX = 0;
   let touchEndX = 0;
   const swipeThreshold = 50; // minimal px untuk deteksi swipe
-  let audioRef: HTMLAudioElement | null = null; // Audio player
 
   function showPrevious() {
     if (activeIndex > 0) activeIndex--;
@@ -134,43 +133,36 @@
 
   // Jalankan saat mount
   onMount(() => {
-    if (typeof window !== "undefined") {
-      // Ganti overflow pakai class
-      document.body.classList.add(hasEntered ? "scroll" : "no-scroll");
+    if (!hasEntered) {
+    document.body.classList.add("scroll-hidden");
+  } else {
+    document.body.classList.remove("scroll-hidden");
+    document.body.classList.add("scroll"); // Optional, kalau kamu ingin mengatur overflow setelah masuk
+  }
 
-      initialLoad = false;
-    }
     observeSections();
-
-    const form = document.getElementById("RSVP") as HTMLFormElement | null;
-
-    if (!form) {
-      console.error('Form dengan ID "RSVP" tidak ditemukan.');
-      return;
-    }
-
-    // Buat Ngirim data ke google spreadsheet dan tetap dihalaman ini
-    form.addEventListener("submit", async (e: Event) => {
-      e.preventDefault();
-
-      const target = e.target as HTMLFormElement;
-      const formData = new FormData(target);
-      const action = target.action;
-
-      try {
-        await fetch(action, {
-          method: "POST",
-          body: formData,
-        });
-
-        alert("Data berhasil dikirim!");
-      } catch (err) {
-        console.error("Gagal mengirim form:", err);
-        alert("Terjadi kesalahan saat mengirim data.");
-      }
-    });
     updateSizes();
     window.addEventListener("resize", updateSizes);
+
+    const form = document.getElementById("RSVP") as HTMLFormElement | null;
+    if (form) {
+      form.addEventListener("submit", async (e: Event) => {
+        e.preventDefault();
+        const target = e.target as HTMLFormElement;
+        const formData = new FormData(target);
+        try {
+          await fetch(target.action, {
+            method: "POST",
+            body: formData,
+          });
+          alert("Data berhasil dikirim!");
+        } catch (err) {
+          console.error("Gagal mengirim form:", err);
+          alert("Terjadi kesalahan saat mengirim data.");
+        }
+      });
+    }
+
     return () => window.removeEventListener("resize", updateSizes);
   });
 
@@ -180,15 +172,16 @@
   function enterInvitation() {
     hasEntered = true;
 
+    // Aktifkan scroll
+    document.body.classList.remove("scroll-hidden");
+    document.body.classList.add("scroll");
+
     // Scroll & hilangkan hero
     setTimeout(() => {
       showHero = false;
       targetSection.scrollIntoView({ behavior: "smooth" });
     }, 1000);
   }
-
-  document.body.classList.remove("no-scroll");
-  document.body.classList.add("scroll");
 </script>
 
 <main>
@@ -242,7 +235,7 @@
   <!-- NAVBAR -->
 
   <Navbar show={hasEntered} />
-  <MusicPlayer show={hasEntered}/>
+  <MusicPlayer show={hasEntered} />
 
   <!-- SECTION CONTAINER SCROLLABLE -->
   <div bind:this={targetSection} class="transition-all duration-1000">
