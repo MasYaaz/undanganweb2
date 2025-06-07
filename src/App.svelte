@@ -13,23 +13,23 @@
   } from "@fortawesome/free-solid-svg-icons";
   import Flipcard from "./lib/Flipcard.svelte";
   import "./app.css";
-  import "leaflet/dist/leaflet.css";
+  import MusicPlayer from "./lib/MusicPlayer.svelte"; //Buat player musik
 
   let targetSection: HTMLDivElement;
   let hasEntered = false; // Variabel untuk menunjukkan halaman utama
   let showHero = true;
   let initialLoad = true;
-  let selected='Ya';
+  let selected = "Ya";
 
   let activeSection = "section2";
   const sections = ["section2", "section3", "section4", "section5"];
 
   export let images: string[] = [
-    "/images/galeri/foto1.jpg",
-    "/images/galeri/foto2.jpg",
-    "/images/galeri/foto3.jpg",
-    "/images/galeri/foto4.jpg",
-    "/images/galeri/foto5.jpg",
+    "./images/galeri/foto1.jpg",
+    "./images/galeri/foto2.jpg",
+    "./images/galeri/foto3.jpg",
+    "./images/galeri/foto4.jpg",
+    "./images/galeri/foto5.jpg",
   ];
 
   let activeIndex = 0;
@@ -41,6 +41,7 @@
   let touchStartX = 0;
   let touchEndX = 0;
   const swipeThreshold = 50; // minimal px untuk deteksi swipe
+  let audioRef: HTMLAudioElement | null = null; // Audio player
 
   function showPrevious() {
     if (activeIndex > 0) activeIndex--;
@@ -90,10 +91,11 @@
       tanggal: "15 Juni 2025",
       waktu: "09.00 - Selesai",
       tempat: "Masjid Al-Akbar Surabaya",
-      alamat: "Jl. Masjid Al-Akbar Timur No.1, Pagesangan, Kec. Jambangan, Surabaya, Jawa Timur 60274, Indonesia",
+      alamat:
+        "Jl. Masjid Al-Akbar Timur No.1, Pagesangan, Kec. Jambangan, Surabaya, Jawa Timur 60274, Indonesia",
       logo: faMosque,
-      alamatMap: "Masjid Al Akbar Surabaya"
-      },
+      alamatMap: "Masjid Al Akbar Surabaya",
+    },
     {
       judulCinzel: "Resepsi nikah",
       srcImage:
@@ -102,10 +104,11 @@
       tanggal: "15 Juni 2025",
       waktu: "20.00 - Selesai",
       tempat: "Graha Adi",
-      alamat: "Jl. Balas Klumprik No.156, Balas Klumprik, Kec. Wiyung, Surabaya, Jawa Timur 60222, Indonesia",
+      alamat:
+        "Jl. Balas Klumprik No.156, Balas Klumprik, Kec. Wiyung, Surabaya, Jawa Timur 60222, Indonesia",
       logo: faPlaceOfWorship,
-      alamatMap: "Graha Adi"
-      },
+      alamatMap: "Graha Adi",
+    },
   ];
 
   function observeSections() {
@@ -132,9 +135,6 @@
   // Jalankan saat mount
   onMount(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("hasEntered");
-      hasEntered = stored === "true";
-
       // Ganti overflow pakai class
       document.body.classList.add(hasEntered ? "scroll" : "no-scroll");
 
@@ -179,17 +179,16 @@
   // Fungsi agar tidak bisa masuk ke section1 (halaman utama) dan aktifkan fungsi scroll
   function enterInvitation() {
     hasEntered = true;
-    localStorage.setItem("hasEntered", "true");
 
-    document.body.classList.remove("no-scroll");
-    document.body.classList.add("scroll");
-
-    // Delay hide section1 agar transisi selesai dulu
+    // Scroll & hilangkan hero
     setTimeout(() => {
       showHero = false;
       targetSection.scrollIntoView({ behavior: "smooth" });
-    }, 1000); // waktu harus sama dengan durasi transisi (1000ms)
+    }, 1000);
   }
+
+  document.body.classList.remove("no-scroll");
+  document.body.classList.add("scroll");
 </script>
 
 <main>
@@ -198,7 +197,7 @@
     <section
       id="section1"
       class="section-hero fixed inset-0 z-50 flex flex-col items-center justify-center bg-cover bg-center px-4 text-center transition-transform duration-1000 ease-in-out"
-      style="background-image: url('/images/back1.jpg')"
+      style="background-image: url('./images/back1.jpg')"
       class:hidden-slide={hasEntered}
     >
       <!-- Overlay semi-transparan -->
@@ -224,14 +223,14 @@
         </h2>
 
         <img
-          src="/images/place1.png"
+          src="./images/place1.png"
           alt="ornamen dekorasi"
           class="mb-50 h-auto w-60 md:w-150"
         />
 
         <!-- Tombol -->
         <button
-          class="font-primary mt-10 flex w-fit items-center gap-2 rounded-full bg-pink-500 px-6 py-3 font-semibold text-white transition duration-300 hover:bg-pink-600"
+          class="font-primary mt-10 flex w-fit items-center gap-2 rounded-full bg-pink-500 px-6 py-3 font-semibold text-white transition duration-300 hover:bg-pink-600 hover:cursor-pointer"
           on:click={enterInvitation}
         >
           Lihat Undangan
@@ -241,14 +240,16 @@
     </section>
   {/if}
   <!-- NAVBAR -->
+
   <Navbar show={hasEntered} />
+  <MusicPlayer show={hasEntered}/>
 
   <!-- SECTION CONTAINER SCROLLABLE -->
   <div bind:this={targetSection} class="transition-all duration-1000">
     <!-- Section 2 dan 3 -->
     <div
       class="relative"
-      style="background-image: url('/images/back2.jpg'); background-size: cover; background-position: center;"
+      style="background-image: url('./images/back2.jpg'); background-size: cover; background-position: center;"
     >
       <!-- Overlay semi-transparan -->
       <div
@@ -283,15 +284,16 @@
 
           <!-- Kotak gambar tengah -->
           <div
-            class="my-6 h-content w-80 overflow-hidden rounded-t-[100px] md:h-content md:w-100">
-            <img src="/images/duo.png" alt="foto berdua">
+            class="my-6 h-content w-80 overflow-hidden rounded-t-[100px] md:h-content md:w-100"
+          >
+            <img src="./images/duo.png" alt="foto berdua" />
           </div>
 
           <!-- Paragraf bawah -->
           <h3
             class="font-lora mt-0 text-lg font-[500] text-pink-700 uppercase drop-shadow md:text-3xl"
           >
-            Kamis, 25 Mei 2023 - 09.00 WIB
+            Sabtu, 15 Juni 2025
           </h3>
 
           <p
@@ -301,7 +303,7 @@
           </p>
 
           <img
-            src="/images/place1.png"
+            src="./images/place1.png"
             alt="Foto estetik"
             class="h-fit w-60 object-cover md:w-150"
           />
@@ -366,7 +368,7 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img src="/images/laki.png" alt="laki-laki">
+                <img src="./images/laki.png" alt="laki-laki" />
               </div>
               <h3 class="font-jane text-base md:text-lg">Muhammad bin Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
@@ -382,7 +384,7 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img src="/images/perempuan.png" alt="perempuan">
+                <img src="./images/perempuan.png" alt="perempuan" />
               </div>
               <h3 class="font-jane text-lg">Aishah Binti Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
@@ -400,7 +402,7 @@
     <!-- Section 4 sampai 6 -->
     <div
       class="relative"
-      style="background-image: url('/images/back2.jpg'); background-size: cover; background-position: center;"
+      style="background-image: url('./images/back2.jpg'); background-size: cover; background-position: center;"
     >
       <!-- Overlay semi-transparan -->
       <div
@@ -563,7 +565,9 @@
                 Apakah Anda akan hadir?
               </p>
               <div class="flex items-center space-x-6">
-                <label class="radio-wrapper hover:scale-102 transition-transform">
+                <label
+                  class="radio-wrapper hover:scale-102 transition-transform"
+                >
                   <input
                     type="radio"
                     name="Kehadiran"
@@ -572,13 +576,15 @@
                     bind:group={selected}
                   />
                   <span class="icon-wrapper">
-                    <FontAwesomeIcon icon={faCheck}/>
+                    <FontAwesomeIcon icon={faCheck} />
                   </span>
                   <span class="ml-2 text-gray-700 font-poppins"
                     >Ya, saya akan hadir</span
                   >
                 </label>
-                <label class="radio-wrapper hover:scale-102 transition-transform">
+                <label
+                  class="radio-wrapper hover:scale-102 transition-transform"
+                >
                   <input
                     type="radio"
                     name="Kehadiran"
@@ -587,7 +593,7 @@
                     bind:group={selected}
                   />
                   <span class="icon-wrapper">
-                    <FontAwesomeIcon icon={faCheck}/>
+                    <FontAwesomeIcon icon={faCheck} />
                   </span>
                   <span class="ml-2 text-gray-700 font-poppins"
                     >Maaf, saya tidak bisa hadir</span
@@ -657,47 +663,47 @@
   }
 
   /* Custom radio */
-.radio-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-}
+  .radio-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
 
-.custom-radio {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 0px;
-  height: 20px;
-  position: relative;
-  cursor: pointer;
-}
+  .custom-radio {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 0px;
+    height: 20px;
+    position: relative;
+    cursor: pointer;
+  }
 
-.custom-radio:checked + .icon-wrapper{
-  visibility: visible;
-  color: red;
-}
+  .custom-radio:checked + .icon-wrapper {
+    visibility: visible;
+    color: red;
+  }
 
-.icon-wrapper {
-  visibility: visible; /* sembunyikan tapi tetap ambil ruang */
-  color: grey;
-  font-size: 16px;
-  pointer-events: none;
-  width: 16px;       /* atur lebar tetap */
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 0;
-}
+  .icon-wrapper {
+    visibility: visible; /* sembunyikan tapi tetap ambil ruang */
+    color: grey;
+    font-size: 16px;
+    pointer-events: none;
+    width: 16px; /* atur lebar tetap */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 0;
+  }
 
-.icon {
-  position: absolute;
-  color: white;
-  font-size: 14px;
-  pointer-events: none;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
+  .icon {
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 </style>

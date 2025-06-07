@@ -32,20 +32,6 @@
     if (section) section.scrollIntoView({ behavior: "smooth" });
   }
 
-  function scrollActiveButtonToCenter() {
-    if (window.innerWidth < 768) {
-      const index = navItems.findIndex((item) => item.id === activeSection);
-      const el = buttonElements[index];
-      if (el) {
-        el.scrollIntoView({
-          behavior: "smooth",
-          inline: "center",
-          block: "nearest",
-        });
-      }
-    }
-  }
-
   function updateNavTranslateX(index: number) {
     // Lebar tombol (harus sama dengan CSS, misal 100px)
     const itemWidth = 100;
@@ -92,7 +78,7 @@
 {#if show}
   <!-- Navbar Atas -->
   <nav
-    class="fixed top-0 z-50 w-full bg-white/30 shadow backdrop-blur-md px-6 py-2 md:py-4 flex justify-center items-center"
+    class="fixed top-0 z-50 w-full bg-white/30 shadow-md backdrop-blur-md px-6 py-2 md:py-4 flex justify-center items-center"
   >
     <h1 class="text-lg font-lora uppercase font-bold">
       <FontAwesomeIcon icon={faEnvelopeOpen} /> Undangan Digital
@@ -101,7 +87,7 @@
 
   <!-- Navbar Bawah -->
   <nav
-    class="fixed bottom-0 z-50 w-full bg-white/30 shadow backdrop-blur-md overflow-x-auto scrollbar-hide"
+    class="fixed bottom-0 z-50 w-full bg-white/30 shadow-lg/100 backdrop-blur-md overflow-x-auto scrollbar-hide"
   >
     <ul
       class="w-screen justify-center flex gap-6 md:gap-20 text-center text-sm px-4 py-2 md:py-4 md:justify-center min-w-full"
