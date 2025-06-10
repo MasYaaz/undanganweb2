@@ -189,12 +189,12 @@
   {#if showHero}
     <section
       id="section1"
-      class="section-hero fixed inset-0 z-50 flex flex-col items-center justify-center bg-cover bg-center px-4 text-center transition-transform duration-1000 ease-in-out"
-      style="background-image: url('./images/back1.webp')"
+      style="background-image: url('./images/back1.webp'); background-size: cover; background-position: center;"
+      class="section-hero fixed inset-0 z-50 flex flex-col items-center justify-center px-4 text-center transition-transform duration-1000 ease-in-out');"
       class:hidden-slide={hasEntered}
     >
       <!-- Overlay semi-transparan -->
-      <div class="absolute inset-0 bg-white/50 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 bg-white/60 backdrop-blur-sm"></div>
 
       <!-- Konten utama -->
       <div class="relative z-10 flex flex-col items-center">
@@ -216,6 +216,9 @@
         </h2>
 
         <img
+          loading="eager"
+          width="600"
+          height="80"
           src="./images/place1.webp"
           alt="ornamen dekorasi"
           class="mb-50 h-auto w-60 md:w-150"
@@ -277,9 +280,14 @@
 
           <!-- Kotak gambar tengah -->
           <div
-            class="my-6 h-content w-80 overflow-hidden rounded-t-[100px] md:h-content md:w-100"
+            class="my-6 h-content w-80 overflow-hidden rounded-t-[100px] md:h-content md:w-100 justify-center"
           >
-            <img src="./images/duo.webp" alt="foto berdua" />
+            <img 
+              src="./images/duo.webp" 
+              width="400"
+              height="400"
+              alt="foto berdua"
+              loading="lazy" />
           </div>
 
           <!-- Paragraf bawah -->
@@ -361,7 +369,12 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img src="./images/laki.webp" alt="laki-laki" />
+                <img 
+                  width="400"
+                  height="400"
+                  loading="eager"
+                  src="./images/laki.webp" 
+                  alt="laki-laki" />
               </div>
               <h3 class="font-jane text-base md:text-lg">Muhammad bin Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
@@ -377,7 +390,12 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img src="./images/perempuan.webp" alt="perempuan" />
+                <img 
+                  width="400"
+                  height="400"
+                  loading="lazy"
+                  src="./images/perempuan.webp" 
+                  alt="perempuan" />
               </div>
               <h3 class="font-jane text-lg">Aishah Binti Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">

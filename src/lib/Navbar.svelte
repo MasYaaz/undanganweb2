@@ -63,7 +63,7 @@
       <li class="shrink-0">
         <button
           on:click={() => handleNavClick(id)}
-          class="flex flex-col xl:flex-row items-center transition duration-300 hover:scale-105"
+          class="flex flex-col xl:flex-row items-center transition duration-300 hover:scale-105 hover:cursor-pointer"
           class:text-pink-600={activeSection === id}
           class:font-bold={activeSection === id}
           class:scale-105={activeSection === id}

@@ -2,6 +2,7 @@
   import { FontAwesomeIcon } from "@fortawesome/svelte-fontawesome";
   import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
   import MapEmbed from "./MapEmbed.svelte";
+  import { onMount } from "svelte";
 
   export let judulCinzel: string;
   export let srcImage: string;
@@ -13,12 +14,23 @@
   export let logo: IconDefinition;
   export let alamatMap: string;
 
+  let showMap = false;
+
   let flipped = false;
   function toggleFlip() {
     flipped = !flipped;
     if (flipped) {
     }
   }
+
+  // Tunda render iframe selama 2 detik setelah mount
+  onMount(() => {
+    const timeout = setTimeout(() => {
+      showMap = true;
+    }, 2000); // bisa kamu ubah sesuai kebutuhan
+
+    return () => clearTimeout(timeout);
+  });
 </script>
 
 <button
@@ -68,7 +80,9 @@
             {alamat}
           </p>
         </div>
+        {#if showMap}
         <MapEmbed {alamatMap} />
+        {/if}
       </div>
     </div>
   </div>
