@@ -134,11 +134,11 @@
   // Jalankan saat mount
   onMount(() => {
     if (!hasEntered) {
-    document.body.classList.add("scroll-hidden");
-  } else {
-    document.body.classList.remove("scroll-hidden");
-    document.body.classList.add("scroll"); // Optional, kalau kamu ingin mengatur overflow setelah masuk
-  }
+      document.body.classList.add("scroll-hidden");
+    } else {
+      document.body.classList.remove("scroll-hidden");
+      document.body.classList.add("scroll"); // Optional, kalau kamu ingin mengatur overflow setelah masuk
+    }
 
     observeSections();
     updateSizes();
@@ -459,8 +459,8 @@
       <section
         id="section5"
         class="flex min-h-screen flex-col items-center justify-center py-16"
-        on:touchstart={handleTouchStart}
-        on:touchend={handleTouchEnd}
+        on:touchstart|passive={handleTouchStart}
+        on:touchend|passive={handleTouchEnd}
       >
         <div class="relative mb-10 lg:mb-20 px-4 text-center">
           <h2
@@ -487,24 +487,30 @@
                 class="slide-item flex flex-shrink-0 items-center justify-center"
                 style="width: 300px;"
               >
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                <img
-                  src={img}
-                  alt={`Foto ${i + 1}`}
-                  loading="lazy"
-                  class={`cursor-pointer rounded-xl object-cover transition-all duration-500
-              ${
-                i === activeIndex
-                  ? "z-10 h-[500px] w-[300px] border-4 border-white shadow-2xl"
-                  : "h-[350px] w-[200px] opacity-60 blur-sm brightness-75"
-              }
-            `}
+                <button
+                  type="button"
                   on:click={() => {
                     if (i < activeIndex) showPrevious();
                     else if (i > activeIndex) showNext();
                   }}
-                />
+                  class="focus:outline-none"
+                  aria-label={`Lihat foto ${i + 1}`}
+                >
+                  <img
+                    src={img}
+                    alt={`Foto ${i + 1}`}
+                    width={i === activeIndex ? 300 : 200}
+                    height={i === activeIndex ? 500 : 350}
+                    loading="lazy"
+                    class={`rounded-xl object-cover transition-all duration-500
+                ${
+                  i === activeIndex
+                    ? "z-10 h-[500px] w-[300px] border-4 border-white shadow-2xl"
+                    : "h-[350px] w-[200px] opacity-60 blur-sm brightness-75"
+                }
+              `}
+                  />
+                </button>
               </div>
             {/each}
           </div>
