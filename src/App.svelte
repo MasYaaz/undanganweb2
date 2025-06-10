@@ -25,11 +25,11 @@
   const sections = ["section2", "section3", "section4", "section5"];
 
   export let images: string[] = [
-    "./images/galeri/foto1.jpg",
-    "./images/galeri/foto2.jpg",
-    "./images/galeri/foto3.jpg",
-    "./images/galeri/foto4.jpg",
-    "./images/galeri/foto5.jpg",
+    "./images/galeri/foto1.webp",
+    "./images/galeri/foto2.webp",
+    "./images/galeri/foto3.webp",
+    "./images/galeri/foto4.webp",
+    "./images/galeri/foto5.webp",
   ];
 
   let activeIndex = 0;
@@ -190,7 +190,7 @@
     <section
       id="section1"
       class="section-hero fixed inset-0 z-50 flex flex-col items-center justify-center bg-cover bg-center px-4 text-center transition-transform duration-1000 ease-in-out"
-      style="background-image: url('./images/back1.jpg')"
+      style="background-image: url('./images/back1.webp')"
       class:hidden-slide={hasEntered}
     >
       <!-- Overlay semi-transparan -->
@@ -216,7 +216,7 @@
         </h2>
 
         <img
-          src="./images/place1.png"
+          src="./images/place1.webp"
           alt="ornamen dekorasi"
           class="mb-50 h-auto w-60 md:w-150"
         />
@@ -242,7 +242,7 @@
     <!-- Section 2 dan 3 -->
     <div
       class="relative"
-      style="background-image: url('./images/back2.jpg'); background-size: cover; background-position: center;"
+      style="background-image: url('./images/back2.webp'); background-size: cover; background-position: center;"
     >
       <!-- Overlay semi-transparan -->
       <div
@@ -279,7 +279,7 @@
           <div
             class="my-6 h-content w-80 overflow-hidden rounded-t-[100px] md:h-content md:w-100"
           >
-            <img src="./images/duo.png" alt="foto berdua" />
+            <img src="./images/duo.webp" alt="foto berdua" />
           </div>
 
           <!-- Paragraf bawah -->
@@ -296,7 +296,7 @@
           </p>
 
           <img
-            src="./images/place1.png"
+            src="./images/place1.webp"
             alt="Foto estetik"
             class="h-fit w-60 object-cover md:w-150"
           />
@@ -361,7 +361,7 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img src="./images/laki.png" alt="laki-laki" />
+                <img src="./images/laki.webp" alt="laki-laki" />
               </div>
               <h3 class="font-jane text-base md:text-lg">Muhammad bin Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
@@ -377,7 +377,7 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img src="./images/perempuan.png" alt="perempuan" />
+                <img src="./images/perempuan.webp" alt="perempuan" />
               </div>
               <h3 class="font-jane text-lg">Aishah Binti Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
@@ -395,7 +395,7 @@
     <!-- Section 4 sampai 6 -->
     <div
       class="relative"
-      style="background-image: url('./images/back2.jpg'); background-size: cover; background-position: center;"
+      style="background-image: url('./images/back2.webp'); background-size: cover; background-position: center;"
     >
       <!-- Overlay semi-transparan -->
       <div
