@@ -21,21 +21,16 @@
   }
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<div
-  class="card-container transition-transform hover:scale-105"
+<button
+  type="button"
+  class="card-container transition-transform hover:scale-105 focus:outline-none"
   on:click={toggleFlip}
 >
   <div class="card {flipped ? 'flipped' : ''}">
     <!-- Front -->
-    <div
-      class="card-face card-front flex flex-col items-center justify-center pt-3"
-    >
+    <div class="card-face card-front flex flex-col items-center justify-center pt-3">
       <h2 class="font-jane text-xl lg:text-3xl">Acara</h2>
-      <h2
-        class="font-cinzeldeco -mt-1 lg:mb-8 text-2xl lg:text-5xl font-semibold"
-      >
+      <h2 class="font-cinzeldeco -mt-1 lg:mb-8 text-2xl lg:text-5xl font-semibold">
         {judulCinzel}
       </h2>
       <img
@@ -45,24 +40,16 @@
         alt="Logo"
         class="lg:mt-5 lg:mb-5"
       />
-      <h3
-        class="font-poppins lg:mb-1 text-4xl lg:text-6xl font-bold tracking-[3px] uppercase"
-      >
+      <h3 class="font-poppins lg:mb-1 text-4xl lg:text-6xl font-bold tracking-[3px] uppercase">
         {hari}
       </h3>
-      <h3
-        class="font-poppins -mb-1 text-lg lg:text-3xl font-semibold tracking-[3px]"
-      >
+      <h3 class="font-poppins -mb-1 text-lg lg:text-3xl font-semibold tracking-[3px]">
         {tanggal}
       </h3>
-      <h3
-        class="font-poppins mb-1 text-base lg:text-2xl tracking-widest uppercase"
-      >
+      <h3 class="font-poppins mb-1 text-base lg:text-2xl tracking-widest uppercase">
         {waktu}
       </h3>
-      <h3
-        class="font-poppins mt-2 lg:mt-20 text-[10px] lg:text-base tracking-widest"
-      >
+      <h3 class="font-poppins mt-2 lg:mt-20 text-[10px] lg:text-base tracking-widest">
         Tekan kartu untuk info lebih lanjut!
       </h3>
     </div>
@@ -77,17 +64,16 @@
           <p class="font-poppins font-bold text-xl lg:text-3xl uppercase mb-2">
             {tempat}
           </p>
-          <p
-            class="font-poppins font-thin tracking-widest text-[10px] lg:text-sm mb-2"
-          >
+          <p class="font-poppins font-thin tracking-widest text-[10px] lg:text-sm mb-2">
             {alamat}
           </p>
         </div>
-        <MapEmbed {alamatMap}/>
+        <MapEmbed {alamatMap} />
       </div>
     </div>
   </div>
-</div>
+</button>
+
 
 <style>
   .card-container {

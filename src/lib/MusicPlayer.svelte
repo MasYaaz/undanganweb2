@@ -3,54 +3,37 @@
   import { FontAwesomeIcon } from "@fortawesome/svelte-fontawesome";
   import { afterUpdate } from "svelte";
 
-  let isPlaying = false;
-  export let show: boolean = false;
+  export let show = false;
   let audioRef: HTMLAudioElement;
-
-  // Coba autoplay hanya sekali saat `show` pertama kali true
-  let hasTriedAutoplay = false;
+  let isPlaying = false;
+  let triedAutoplay = false;
 
   afterUpdate(() => {
-    if (show && audioRef && !isPlaying && !hasTriedAutoplay) {
-      audioRef.play()
-        .then(() => {
-          isPlaying = true;
-          hasTriedAutoplay = true;
-        })
-        .catch((e) => {
-          console.warn("Autoplay blocked:", e);
-          hasTriedAutoplay = true;
-        });
+    if (show && audioRef && !isPlaying && !triedAutoplay) {
+      audioRef.play().then(() => {
+        isPlaying = true;
+      }).catch(() => {
+        console.warn("Autoplay blocked");
+      }).finally(() => {
+        triedAutoplay = true;
+      });
     }
   });
 
-  function toggleMusic() {
+  const toggleMusic = () => {
     if (!audioRef) return;
-    if (isPlaying) {
-      audioRef.pause();
-      isPlaying = false;
-    } else {
-      audioRef.play()
-        .then(() => {
-          isPlaying = true;
-        })
-        .catch((e) => {
-          console.warn("Play error:", e);
-        });
-    }
-  }
+    isPlaying ? audioRef.pause() : audioRef.play().catch(console.warn);
+    isPlaying = !isPlaying;
+  };
 </script>
 
 {#if show}
   <button
-    class="fixed bottom-2 lg:bottom-2 left-4 lg:left-6 z-50 bg-pink-200 text-black rounded-[18px] p-2 lg:p-3 shadow-lg hover:bg-pink-100 transition hover:cursor-pointer duration-300 hover:scale-105 "
     on:click={toggleMusic}
+    type="button"
+    class="fixed bottom-2 left-4 lg:left-6 z-50 p-2 lg:p-3 rounded-[18px] bg-pink-200 text-black shadow-lg hover:bg-pink-100 transition duration-300 hover:scale-105 focus:outline-none"
   >
-    {#if isPlaying}
-      <FontAwesomeIcon icon={faVolumeHigh} />
-    {:else}
-      <FontAwesomeIcon icon={faVolumeMute} />
-    {/if}
+    <FontAwesomeIcon icon={isPlaying ? faVolumeHigh : faVolumeMute} />
   </button>
 
   <audio bind:this={audioRef} loop>
