@@ -43,7 +43,7 @@
 
 {#if show}
   <button
-    class="fixed bottom-2 lg:bottom-2 left-4 lg:left-6 z-50 bg-pink-200 text-black rounded-[18px] p-2 lg:p-3 shadow-lg hover:bg-pink-100 transition hover:cursor-pointer duration-300 hover:scale-105 "
+    class="fixed bottom-[13px] lg:bottom-2 left-3 lg:left-6 z-50 bg-pink-200 text-black rounded-[18px] p-2 lg:p-3 shadow-lg hover:bg-pink-100 transition hover:cursor-pointer duration-300 hover:scale-105 "
     on:click={toggleMusic}
   >
     {#if isPlaying}

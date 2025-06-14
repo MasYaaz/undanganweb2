@@ -2,7 +2,12 @@
   import { onMount } from "svelte";
   import Countdown from "./lib/Countdown.svelte";
   import { FontAwesomeIcon } from "@fortawesome/svelte-fontawesome";
-  import Navbar from "./lib/Navbar.svelte"; //Import Navbar Component
+  import Navbar from "./lib/Navbar.svelte";
+  import MusicPlayer from "./lib/MusicPlayer.svelte";
+  import Flipcard from "./lib/Flipcard.svelte";
+  import "./app.css";
+
+  // --- Icon Font Awesome ---
   import { faEnvelopeOpen } from "@fortawesome/free-regular-svg-icons";
   import {
     faCalendarAlt,
@@ -11,19 +16,19 @@
     faPaperPlane,
     faPlaceOfWorship,
   } from "@fortawesome/free-solid-svg-icons";
-  import Flipcard from "./lib/Flipcard.svelte";
-  import "./app.css";
-  import MusicPlayer from "./lib/MusicPlayer.svelte"; //Buat player musik
 
+  // --- Variabel State Reaktif ---
   let targetSection: HTMLDivElement;
-  let hasEntered = false; // Variabel untuk menunjukkan halaman utama
-  let showHero = true;
-  let initialLoad = true;
-  let selected = "Ya";
+  let hasEntered: boolean = false;
+  let showHero: boolean = true;
+  let initialLoad: boolean = true;
+  let selected: string = "Ya";
 
-  let activeSection = "section2";
-  const sections = ["section2", "section3", "section4", "section5"];
+  // --- Navigasi dan Observasi Bagian ---
+  let activeSection: string = "section2";
+  const sections: string[] = ["section2", "section3", "section4", "section5"];
 
+  // --- State Galeri Gambar ---
   export let images: string[] = [
     "./images/galeri/foto1.webp",
     "./images/galeri/foto2.webp",
@@ -31,157 +36,325 @@
     "./images/galeri/foto4.webp",
     "./images/galeri/foto5.webp",
   ];
+  let activeIndex: number = 0; // Mengindikasikan indeks gambar yang sedang ditampilkan di galeri (0 = gambar pertama).
+  let container: HTMLDivElement; // Referensi ke elemen div utama yang membungkus semua slide galeri.
+  let containerWidth: number = 800; // Lebar wadah galeri dalam piksel.
+  let translateX: number = 0; // Nilai transform CSS `translateX()` yang digunakan untuk menggeser kumpulan slide secara horizontal.
 
-  let activeIndex = 0;
-  let container: HTMLDivElement;
-  let slideWidth = 260;
-  let containerWidth = 800;
-  let translateX = 0;
+  // --- State Sentuh/Geser untuk Galeri ---
+  let isDragging: boolean = false; // Menandakan apakah pengguna sedang melakukan drag
+  let startX: number = 0; // Posisi X awal sentuhan saat drag dimulai
+  let currentTranslate: number = 0; // Posisi translateX saat drag dimulai (nilai awal sebelum digeser)
+  const swipeThreshold: number = 50; // Batas minimal gerakan horizontal untuk berpindah slide setelah drag berakhir
 
-  let touchStartX = 0;
-  let touchEndX = 0;
-  const swipeThreshold = 50; // minimal px untuk deteksi swipe
+  let animationFrameId: number | null = null; // ID untuk requestAnimationFrame
 
-  function showPrevious() {
-    if (activeIndex > 0) activeIndex--;
-    updateTranslateX();
-  }
-
-  function showNext() {
-    if (activeIndex < images.length - 1) activeIndex++;
-    updateTranslateX();
-  }
-
-  function updateTranslateX() {
-    const offset = containerWidth / 2 - slideWidth / 2;
-    translateX = -activeIndex * slideWidth + offset;
-  }
-
-  function updateSizes() {
-    if (!container) return;
-    containerWidth = container.clientWidth;
-    const slide = container.querySelector<HTMLDivElement>(".slide-item");
-    slideWidth = slide ? slide.clientWidth : 260;
-    updateTranslateX();
-  }
-
-  function handleTouchStart(event: TouchEvent) {
-    touchStartX = event.changedTouches[0].clientX;
-  }
-
-  function handleTouchEnd(event: TouchEvent) {
-    touchEndX = event.changedTouches[0].clientX;
-    const deltaX = touchEndX - touchStartX;
-
-    if (Math.abs(deltaX) > swipeThreshold) {
-      if (deltaX > 0) {
-        showPrevious();
-      } else {
-        showNext();
-      }
-    }
-  }
-
-  const kartuAcara = [
+  // --- Data Acara ---
+  const eventCards = [
     {
-      judulCinzel: "Akad nikah",
-      srcImage: "https://img.icons8.com/glyph-neue/256/newlyweds.png",
-      hari: "Sabtu",
-      tanggal: "15 Juni 2025",
-      waktu: "09.00 - Selesai",
-      tempat: "Masjid Al-Akbar Surabaya",
-      alamat:
+      title: "Akad nikah",
+      imageSrc: "https://img.icons8.com/glyph-neue/256/newlyweds.png",
+      day: "Sabtu",
+      date: "15 Juni 2025",
+      time: "09.00 - Selesai",
+      venue: "Masjid Al-Akbar Surabaya",
+      address:
         "Jl. Masjid Al-Akbar Timur No.1, Pagesangan, Kec. Jambangan, Surabaya, Jawa Timur 60274, Indonesia",
-      logo: faMosque,
-      alamatMap: "Masjid Al Akbar Surabaya",
+      icon: faMosque,
+      mapQuery: "Masjid Al Akbar Surabaya",
     },
     {
-      judulCinzel: "Resepsi nikah",
-      srcImage:
+      title: "Resepsi nikah",
+      imageSrc:
         "https://img.icons8.com/external-glyphons-amoghdesign/256/external-celebrate-st-patricks-day-glyphons-amoghdesign.png",
-      hari: "Sabtu",
-      tanggal: "15 Juni 2025",
-      waktu: "20.00 - Selesai",
-      tempat: "Graha Adi",
-      alamat:
+      day: "Sabtu",
+      date: "15 Juni 2025",
+      time: "20.00 - Selesai",
+      venue: "Graha Adi",
+      address:
         "Jl. Balas Klumprik No.156, Balas Klumprik, Kec. Wiyung, Surabaya, Jawa Timur 60222, Indonesia",
-      logo: faPlaceOfWorship,
-      alamatMap: "Graha Adi",
+      icon: faPlaceOfWorship,
+      mapQuery: "Graha Adi",
     },
   ];
 
-  function observeSections() {
-    const options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.6, // Saat 60% terlihat, dianggap aktif
-    };
+  // --- Tanggal Target Hitung Mundur ---
+  const targetDate: Date = new Date("2025-06-15T10:00:00");
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          activeSection = entry.target.id;
-        }
-      });
-    }, options);
-
-    sections.forEach((id) => {
-      const section = document.getElementById(id);
-      if (section) observer.observe(section);
-    });
+  // --- Fungsi: Navigasi Galeri ---
+  /**
+   * Mengatur indeks gambar aktif dan kemudian memperbarui posisi visual galeri.
+   * Ini adalah fungsi inti yang dipanggil oleh showPrevious, showNext, atau updateSizes.
+   */
+  function setActiveSlide(newIndex: number): void {
+    activeIndex = Math.max(0, Math.min(newIndex, images.length - 1));
+    updateTranslateX(); // Panggil updateTranslateX setelah activeIndex diubah.
   }
 
-  // Jalankan saat mount
-  onMount(() => {
-    if (!hasEntered) {
-      document.body.classList.add("scroll-hidden");
-    } else {
-      document.body.classList.remove("scroll-hidden");
-      document.body.classList.add("scroll"); // Optional, kalau kamu ingin mengatur overflow setelah masuk
+  /**
+   * Menggeser galeri untuk menampilkan gambar sebelumnya.
+   */
+  function showPrevious(): void {
+    setActiveSlide(activeIndex - 1);
+  }
+
+  /**
+   * Menggeser galeri untuk menampilkan gambar berikutnya.
+   */
+  function showNext(): void {
+    setActiveSlide(activeIndex + 1);
+  }
+
+/**
+   * Mengkalkulasi nilai `translateX` yang diperlukan untuk memusatkan gambar aktif.
+   * Ini memastikan gambar yang sedang aktif selalu berada di tengah-tengah wadah galeri.
+   */
+  function updateTranslateX(): void {
+    if (!container || images.length === 0) {
+      translateX = 0; // Reset jika tidak ada container atau gambar
+      return;
     }
 
-    observeSections();
-    updateSizes();
-    window.addEventListener("resize", updateSizes);
-
-    const form = document.getElementById("RSVP") as HTMLFormElement | null;
-    if (form) {
-      form.addEventListener("submit", async (e: Event) => {
-        e.preventDefault();
-        const target = e.target as HTMLFormElement;
-        const formData = new FormData(target);
-        try {
-          await fetch(target.action, {
-            method: "POST",
-            body: formData,
-          });
-          alert("Data berhasil dikirim!");
-        } catch (err) {
-          console.error("Gagal mengirim form:", err);
-          alert("Terjadi kesalahan saat mengirim data.");
-        }
-      });
+    // Dapatkan semua elemen slide-item
+    const slideItems = container.querySelectorAll<HTMLDivElement>('.slide-item');
+    if (slideItems.length === 0) {
+        translateX = 0;
+        return;
     }
 
-    return () => window.removeEventListener("resize", updateSizes);
-  });
+    // Dapatkan elemen slide yang sedang aktif
+    const activeSlideElement = slideItems[activeIndex];
+    if (!activeSlideElement) {
+        translateX = 0;
+        return;
+    }
 
-  const targetDate = new Date("2025-06-15T10:00:00"); // Variabel buat tanggal countdown
+    // Lebar wadah tampilan galeri (container)
+    containerWidth = container.clientWidth;
 
-  // Fungsi agar tidak bisa masuk ke section1 (halaman utama) dan aktifkan fungsi scroll
-  function enterInvitation() {
+    // Hitung posisi tengah container
+    const containerCenter = containerWidth / 2;
+
+    // Hitung posisi tengah dari elemen slide yang aktif RELATIF TERHADAP container geser
+    // activeSlideElement.offsetLeft memberikan posisi dari awal wadah FLEX (div yang digeser)
+    const activeSlideCenterInFlex = activeSlideElement.offsetLeft + activeSlideElement.clientWidth / 2;
+
+    // Nilai translateX yang dibutuhkan untuk memusatkan slide aktif
+    let newTranslateX = containerCenter - activeSlideCenterInFlex;
+
+    // --- Penanganan Batas ---
+
+    // 1. Batas Kanan (tidak boleh geser terlalu jauh ke kanan, yaitu translateX > 0)
+    // Jika posisi awal slide pertama digeser ke kanan melebihi batas, kembalikan ke 0
+    if (newTranslateX > 0) {
+        newTranslateX = 0;
+    }
+
+    // 2. Batas Kiri (tidak boleh geser terlalu jauh ke kiri)
+    // Hitung lebar total dari semua slide (termasuk margin) yang ada di dalam wadah flex
+    // Ini adalah 'scrollWidth' dari elemen flex container
+    const totalContentWidth = container.querySelector<HTMLDivElement>('.flex')?.scrollWidth || 0;
+
+    // Nilai translateX minimum yang diizinkan (maksimal geser ke kiri)
+    // Ini adalah saat slide terakhir 'seharusnya' berada di paling kanan container
+    const minAllowedTranslateX = containerWidth - totalContentWidth;
+
+    // Pastikan newTranslateX tidak lebih kecil dari minAllowedTranslateX
+    // Kita juga perlu memastikan bahwa minAllowedTranslateX tidak positif (artinya totalContentWidth lebih kecil dari containerWidth,
+    // yang berarti semua slide sudah muat dan tidak perlu digeser ke kiri)
+    if (minAllowedTranslateX < 0 && newTranslateX < minAllowedTranslateX) {
+        newTranslateX = minAllowedTranslateX;
+    } else if (minAllowedTranslateX >= 0) {
+        // Jika semua konten sudah muat dalam container (misal, hanya 1 atau 2 gambar),
+        // maka pusatkannya di tengah container, bukan geser ke kiri
+        newTranslateX = (containerWidth - totalContentWidth) / 2;
+    }
+
+
+    translateX = newTranslateX;
+  }
+
+
+/**
+   * Memperbarui ukuran wadah galeri dan lebar slide secara dinamis.
+   */
+  let resizeTimeout: ReturnType<typeof setTimeout>;
+
+  function updateSizes(): void {
+    clearTimeout(resizeTimeout);
+
+    resizeTimeout = setTimeout(() => {
+      if (!container) return;
+
+      const currentContainerWidth = container.clientWidth;
+      if (currentContainerWidth !== containerWidth) { // Cek hanya jika lebar container berubah
+        containerWidth = currentContainerWidth;
+      }
+      updateTranslateX(); // Selalu panggil updateTranslateX saat ukuran berubah
+    }, 200);
+  }
+
+  // --- Fungsi: Handler Sentuh/Geser untuk Galeri ---
+  /**
+   * Merekam koordinat X awal saat sentuhan dimulai dan menginisialisasi state drag.
+   * @param event Objek TouchEvent dari peristiwa 'touchstart'.
+   */
+  function handleTouchStart(event: TouchEvent): void {
+    isDragging = true;
+    startX = event.touches[0].clientX;
+    currentTranslate = translateX; // Simpan posisi translateX saat ini sebagai dasar
+    // Hentikan transisi CSS sementara saat drag dimulai agar gerakan responsif
+    const slider = container.querySelector<HTMLDivElement>(".flex");
+    if (slider) {
+      slider.style.transition = "none";
+    }
+  }
+
+  /**
+   * Memperbarui posisi galeri secara real-time saat jari digeser.
+   * Menggunakan `requestAnimationFrame` untuk performa animasi yang mulus.
+   * @param event Objek TouchEvent dari peristiwa 'touchmove'.
+   */
+  function handleTouchMove(event: TouchEvent): void {
+    if (!isDragging) return;
+
+    const currentX = event.touches[0].clientX;
+    const deltaX = currentX - startX;
+
+    let newTranslateX = currentTranslate + deltaX;
+
+    // --- Penanganan Batas untuk Dragging ---
+    const totalContentWidth = container.querySelector<HTMLDivElement>('.flex')?.scrollWidth || 0;
+    const minAllowedTranslateX = containerWidth - totalContentWidth;
+
+    // Efek "tarikan elastis" saat di batas kanan (geser ke kanan melewati awal)
+    if (newTranslateX > 0) {
+      newTranslateX = newTranslateX * 0.3; // Lebih sedikit dari 1.0 agar terasa elastis
+    }
+    // Efek "tarikan elastis" saat di batas kiri (geser ke kiri melewati akhir)
+    else if (newTranslateX < minAllowedTranslateX) {
+      newTranslateX =
+        minAllowedTranslateX + (newTranslateX - minAllowedTranslateX) * 0.3;
+    }
+
+    translateX = newTranslateX;
+  }
+
+  /**
+   * Menentukan slide berikutnya berdasarkan seberapa jauh jari digeser
+   * dan mengembalikan transisi CSS setelah drag selesai.
+   * @param event Objek TouchEvent dari peristiwa 'touchend'.
+   */
+  function handleTouchEnd(event: TouchEvent): void {
+    if (!isDragging) return;
+    isDragging = false;
+
+    const deltaX = event.changedTouches[0].clientX - startX; // Total pergeseran dari awal sentuhan
+
+    // Kembalikan transisi CSS
+    const slider = container.querySelector<HTMLDivElement>(".flex");
+    if (slider) {
+      slider.style.transition = "transform 0.7s ease-in-out";
+    }
+
+    // Tentukan slide yang akan dituju setelah drag berakhir
+    let targetIndex = activeIndex;
+    if (deltaX < -swipeThreshold && activeIndex < images.length - 1) {
+      // Geser ke kiri (gambar berikutnya)
+      targetIndex++;
+    } else if (deltaX > swipeThreshold && activeIndex > 0) {
+      // Geser ke kanan (gambar sebelumnya)
+      targetIndex--;
+    }
+
+    // Pindah ke slide target atau kembali ke slide aktif jika tidak ada pergeseran signifikan
+    setActiveSlide(targetIndex);
+  }
+
+  // --- Fungsi: Masuk Halaman dan Kontrol Gulir ---
+  function enterInvitation(): void {
     hasEntered = true;
 
-    // Aktifkan scroll
     document.body.classList.remove("scroll-hidden");
     document.body.classList.add("scroll");
 
-    // Scroll & hilangkan hero
     setTimeout(() => {
       showHero = false;
       targetSection.scrollIntoView({ behavior: "smooth" });
     }, 1000);
   }
+
+  // --- Fungsi: Observasi Bagian untuk Navbar ---
+  function observeSections(): void {
+    const options: IntersectionObserverInit = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.6,
+    };
+
+    const observer = new IntersectionObserver(
+      (entries: IntersectionObserverEntry[]) => {
+        entries.forEach((entry: IntersectionObserverEntry) => {
+          if (entry.isIntersecting) {
+            activeSection = entry.target.id;
+          }
+        });
+      },
+      options
+    );
+
+    sections.forEach((id: string) => {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    });
+  }
+
+  // --- Fungsi: Pengiriman Formulir (RSVP) ---
+  async function handleSubmit(event: Event): Promise<void> {
+    event.preventDefault();
+    const target = event.target as HTMLFormElement;
+    const formData = new FormData(target);
+
+    try {
+      await fetch(target.action, {
+        method: "POST",
+        body: formData,
+      });
+      alert("Data berhasil dikirim!");
+    } catch (err) {
+      console.error("Gagal mengirim form:", err);
+      alert("Terjadi kesalahan saat mengirim data.");
+    }
+  }
+
+  // --- Hook Siklus Hidup Svelte: onMount ---
+  onMount(() => {
+    if (!hasEntered) {
+      document.body.classList.add("scroll-hidden");
+    } else {
+      document.body.classList.remove("scroll-hidden");
+      document.body.classList.add("scroll");
+    }
+
+    observeSections();
+
+    updateSizes(); // Panggil sekali saat mount
+    window.addEventListener("resize", updateSizes); // Tambahkan event listener
+
+    const rsvpForm = document.getElementById("RSVP") as HTMLFormElement | null;
+    if (rsvpForm) {
+      rsvpForm.addEventListener("submit", handleSubmit);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateSizes);
+      clearTimeout(resizeTimeout);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId); // Penting: bersihkan requestAnimationFrame
+      if (rsvpForm) {
+        rsvpForm.removeEventListener("submit", handleSubmit);
+      }
+    };
+  });
 </script>
 
 <main>
@@ -282,12 +455,13 @@
           <div
             class="my-6 h-content w-80 overflow-hidden rounded-t-[100px] md:h-content md:w-100 justify-center"
           >
-            <img 
-              src="./images/duo.webp" 
+            <img
+              src="./images/duo.webp"
               width="400"
               height="400"
               alt="foto berdua"
-              loading="lazy" />
+              loading="lazy"
+            />
           </div>
 
           <!-- Paragraf bawah -->
@@ -369,12 +543,13 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img 
+                <img
                   width="400"
                   height="400"
                   loading="eager"
-                  src="./images/laki.webp" 
-                  alt="laki-laki" />
+                  src="./images/laki.webp"
+                  alt="laki-laki"
+                />
               </div>
               <h3 class="font-jane text-base md:text-lg">Muhammad bin Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
@@ -390,12 +565,13 @@
               <div
                 class="my-3 h-60 w-60 overflow-hidden rounded-t-[100px] lg:h-100 lg:w-100"
               >
-                <img 
+                <img
                   width="400"
                   height="400"
                   loading="lazy"
-                  src="./images/perempuan.webp" 
-                  alt="perempuan" />
+                  src="./images/perempuan.webp"
+                  alt="perempuan"
+                />
               </div>
               <h3 class="font-jane text-lg">Aishah Binti Fulan</h3>
               <h2 class="font-cinzeldeco text-3xl font-bold md:text-4xl">
@@ -456,17 +632,17 @@
             Rincian Acara
           </h2>
           <div class="mt-5 flex flex-col gap-15 lg:mt-20 lg:flex-row">
-            {#each kartuAcara as item}
+            {#each eventCards as item}
               <Flipcard
-                judulCinzel={item.judulCinzel}
-                srcImage={item.srcImage}
-                hari={item.hari}
-                tanggal={item.tanggal}
-                waktu={item.waktu}
-                tempat={item.tempat}
-                alamat={item.alamat}
-                logo={item.logo}
-                alamatMap={item.alamatMap}
+                judulCinzel={item.title}
+                srcImage={item.imageSrc}
+                hari={item.day}
+                tanggal={item.date}
+                waktu={item.time}
+                tempat={item.venue}
+                alamat={item.address}
+                logo={item.icon}
+                alamatMap={item.mapQuery}
               />
             {/each}
           </div>
@@ -478,6 +654,7 @@
         id="section5"
         class="flex min-h-screen flex-col items-center justify-center py-16"
         on:touchstart|passive={handleTouchStart}
+        on:touchmove|passive={handleTouchMove}
         on:touchend|passive={handleTouchEnd}
       >
         <div class="relative mb-10 lg:mb-20 px-4 text-center">
@@ -491,7 +668,6 @@
           </p>
         </div>
 
-        <!-- Slide Container -->
         <div
           bind:this={container}
           class="relative w-full max-w-[900px] h-[800px] overflow-hidden"
@@ -503,13 +679,17 @@
             {#each images as img, i}
               <div
                 class="slide-item flex flex-shrink-0 items-center justify-center"
-                style="width: 300px;"
+                style="width: 300px; margin-right: 20px;"
               >
                 <button
                   type="button"
                   on:click={() => {
-                    if (i < activeIndex) showPrevious();
-                    else if (i > activeIndex) showNext();
+                    // Saat diklik, pastikan bukan hasil dari drag yang gagal
+                    if (!isDragging) {
+                      // Hanya panggil jika tidak dalam mode drag
+                      if (i < activeIndex) showPrevious();
+                      else if (i > activeIndex) showNext();
+                    }
                   }}
                   class="focus:outline-none"
                   aria-label={`Lihat foto ${i + 1}`}
@@ -524,7 +704,7 @@
                 ${
                   i === activeIndex
                     ? "z-10 h-[500px] w-[300px] border-4 border-white shadow-2xl"
-                    : "h-[350px] w-[200px] opacity-60 blur-sm brightness-75"
+                    : "h-[350px] w-[200px] opacity-0 blur-md brightness-50"
                 }
               `}
                   />
@@ -724,4 +904,51 @@
     left: 50%;
     transform: translate(-50%, -50%);
   }
+
+  /* Perbaikan dan penyesuaian CSS untuk galeri */
+  /* Pastikan overflow: hidden ada pada container utama galeri */
+  .gallery-container {
+    /* Ini merujuk pada div dengan bind:this={container} */
+    /* ... properti yang sudah ada ... */
+    overflow: hidden; /* Pastikan ini ada dan berfungsi untuk menyembunyikan konten di luar batas */
+    position: relative; /* Penting untuk z-index dan posisi absolut */
+  }
+
+  .slide-item {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    margin-right: 20px;
+  }
+
+  /* CSS untuk gambar di dalam slide item */
+  .slide-item img {
+    /* Kelas TailwindCSS sudah cukup banyak, tapi pastikan ini */
+    object-fit: cover;
+    /* Transisi untuk properti yang berubah (ukuran, opasitas, blur) */
+    transition: all 0.5s ease-in-out;
+  }
+
+  .slide-item:last-child {
+    margin-right: 0;
+}
+
+  /* Kelas kustom untuk gambar yang tidak aktif */
+  /* Ini menggantikan bagian TailwindCSS di `img` jika Anda ingin lebih banyak kontrol */
+  /* .slide-item img:not(.active) { */
+  /* opacity: 0; /* <-- Pastikan ini 0 untuk menyembunyikan sepenuhnya */
+  /* filter: blur(8px) brightness(50%); */
+  /* width: 200px; */
+  /* height: 350px; */
+  /* } */
+
+  /* .slide-item img.active { */
+  /* opacity: 1; */
+  /* filter: none; */
+  /* width: 300px; */
+  /* height: 500px; */
+  /* z-index: 10; */
+  /* } */
 </style>
