@@ -105,7 +105,7 @@
     setActiveSlide(activeIndex + 1);
   }
 
-/**
+  /**
    * Mengkalkulasi nilai `translateX` yang diperlukan untuk memusatkan gambar aktif.
    * Ini memastikan gambar yang sedang aktif selalu berada di tengah-tengah wadah galeri.
    */
@@ -115,67 +115,70 @@
       return;
     }
 
-    // Dapatkan semua elemen slide-item
-    const slideItems = container.querySelectorAll<HTMLDivElement>('.slide-item');
+    const slideItems =
+      container.querySelectorAll<HTMLDivElement>(".slide-item");
     if (slideItems.length === 0) {
-        translateX = 0;
-        return;
+      translateX = 0;
+      return;
     }
 
-    // Dapatkan elemen slide yang sedang aktif
     const activeSlideElement = slideItems[activeIndex];
     if (!activeSlideElement) {
-        translateX = 0;
-        return;
+      translateX = 0;
+      return;
     }
 
-    // Lebar wadah tampilan galeri (container)
     containerWidth = container.clientWidth;
-
-    // Hitung posisi tengah container
     const containerCenter = containerWidth / 2;
 
+    // Lebar total semua slide termasuk margin
+    const totalContentWidth = Array.from(slideItems).reduce((acc, item) => {
+      const style = getComputedStyle(item);
+      const marginRight = parseFloat(style.marginRight);
+      return acc + item.clientWidth + marginRight;
+    }, 0);
+
+    // Jika semua gambar muat dalam container, pusatkan saja semuanya
+    if (totalContentWidth <= containerWidth) {
+      translateX = (containerWidth - totalContentWidth) / 2;
+      return;
+    }
+
     // Hitung posisi tengah dari elemen slide yang aktif RELATIF TERHADAP container geser
-    // activeSlideElement.offsetLeft memberikan posisi dari awal wadah FLEX (div yang digeser)
-    const activeSlideCenterInFlex = activeSlideElement.offsetLeft + activeSlideElement.clientWidth / 2;
+    const activeSlideCenterInFlex =
+      activeSlideElement.offsetLeft + activeSlideElement.clientWidth / 2;
 
     // Nilai translateX yang dibutuhkan untuk memusatkan slide aktif
     let newTranslateX = containerCenter - activeSlideCenterInFlex;
 
-    // --- Penanganan Batas ---
+    // --- Penanganan Batas yang Disesuaikan ---
 
-    // 1. Batas Kanan (tidak boleh geser terlalu jauh ke kanan, yaitu translateX > 0)
-    // Jika posisi awal slide pertama digeser ke kanan melebihi batas, kembalikan ke 0
-    if (newTranslateX > 0) {
-        newTranslateX = 0;
+    // Batas Kanan:
+    // Jika geser ke kanan (translateX positif), batasi agar slide pertama tidak melewati tengah.
+    // slideItems[0].offsetLeft adalah posisi awal slide pertama.
+    const firstSlideCenterInFlex =
+      slideItems[0].offsetLeft + slideItems[0].clientWidth / 2;
+    const maxAllowedTranslateX = containerCenter - firstSlideCenterInFlex;
+
+    if (newTranslateX > maxAllowedTranslateX) {
+      newTranslateX = maxAllowedTranslateX;
     }
 
-    // 2. Batas Kiri (tidak boleh geser terlalu jauh ke kiri)
-    // Hitung lebar total dari semua slide (termasuk margin) yang ada di dalam wadah flex
-    // Ini adalah 'scrollWidth' dari elemen flex container
-    const totalContentWidth = container.querySelector<HTMLDivElement>('.flex')?.scrollWidth || 0;
+    // Batas Kiri:
+    // minAllowedTranslateX adalah posisi terjauh ke kiri agar slide terakhir masih terlihat sepenuhnya di kanan container.
+    const lastSlideCenterInFlex =
+      slideItems[images.length - 1].offsetLeft +
+      slideItems[images.length - 1].clientWidth / 2;
+    const minAllowedTranslateX = containerCenter - lastSlideCenterInFlex;
 
-    // Nilai translateX minimum yang diizinkan (maksimal geser ke kiri)
-    // Ini adalah saat slide terakhir 'seharusnya' berada di paling kanan container
-    const minAllowedTranslateX = containerWidth - totalContentWidth;
-
-    // Pastikan newTranslateX tidak lebih kecil dari minAllowedTranslateX
-    // Kita juga perlu memastikan bahwa minAllowedTranslateX tidak positif (artinya totalContentWidth lebih kecil dari containerWidth,
-    // yang berarti semua slide sudah muat dan tidak perlu digeser ke kiri)
-    if (minAllowedTranslateX < 0 && newTranslateX < minAllowedTranslateX) {
-        newTranslateX = minAllowedTranslateX;
-    } else if (minAllowedTranslateX >= 0) {
-        // Jika semua konten sudah muat dalam container (misal, hanya 1 atau 2 gambar),
-        // maka pusatkannya di tengah container, bukan geser ke kiri
-        newTranslateX = (containerWidth - totalContentWidth) / 2;
+    if (newTranslateX < minAllowedTranslateX) {
+      newTranslateX = minAllowedTranslateX;
     }
-
 
     translateX = newTranslateX;
   }
 
-
-/**
+  /**
    * Memperbarui ukuran wadah galeri dan lebar slide secara dinamis.
    */
   let resizeTimeout: ReturnType<typeof setTimeout>;
@@ -187,7 +190,8 @@
       if (!container) return;
 
       const currentContainerWidth = container.clientWidth;
-      if (currentContainerWidth !== containerWidth) { // Cek hanya jika lebar container berubah
+      if (currentContainerWidth !== containerWidth) {
+        // Cek hanya jika lebar container berubah
         containerWidth = currentContainerWidth;
       }
       updateTranslateX(); // Selalu panggil updateTranslateX saat ukuran berubah
@@ -224,7 +228,8 @@
     let newTranslateX = currentTranslate + deltaX;
 
     // --- Penanganan Batas untuk Dragging ---
-    const totalContentWidth = container.querySelector<HTMLDivElement>('.flex')?.scrollWidth || 0;
+    const totalContentWidth =
+      container.querySelector<HTMLDivElement>(".flex")?.scrollWidth || 0;
     const minAllowedTranslateX = containerWidth - totalContentWidth;
 
     // Efek "tarikan elastis" saat di batas kanan (geser ke kanan melewati awal)
@@ -933,7 +938,7 @@
 
   .slide-item:last-child {
     margin-right: 0;
-}
+  }
 
   /* Kelas kustom untuk gambar yang tidak aktif */
   /* Ini menggantikan bagian TailwindCSS di `img` jika Anda ingin lebih banyak kontrol */
