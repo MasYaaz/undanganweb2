@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [svelte(), tailwindcss()],
-  base: '/undangan-digital/', // ← penting untuk GitHub Pages
+  base: '/undangan-digital2/', // ← penting untuk GitHub Pages
 })
