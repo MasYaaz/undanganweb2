@@ -48,6 +48,7 @@
   const swipeThreshold: number = 50; // Batas minimal gerakan horizontal untuk berpindah slide setelah drag berakhir
 
   let animationFrameId: number | null = null; // ID untuk requestAnimationFrame
+  let pendingTranslateX: number = 0; // Nilai translateX yang akan di-render di frame berikutnya
 
   // --- Data Acara ---
   const eventCards = [
@@ -207,10 +208,17 @@
     isDragging = true;
     startX = event.touches[0].clientX;
     currentTranslate = translateX; // Simpan posisi translateX saat ini sebagai dasar
+
     // Hentikan transisi CSS sementara saat drag dimulai agar gerakan responsif
     const slider = container.querySelector<HTMLDivElement>(".flex");
     if (slider) {
       slider.style.transition = "none";
+    }
+
+    // Pastikan tidak ada requestAnimationFrame yang tertunda dari interaksi sebelumnya
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
     }
   }
 
@@ -227,22 +235,47 @@
 
     let newTranslateX = currentTranslate + deltaX;
 
-    // --- Penanganan Batas untuk Dragging ---
-    const totalContentWidth =
-      container.querySelector<HTMLDivElement>(".flex")?.scrollWidth || 0;
-    const minAllowedTranslateX = containerWidth - totalContentWidth;
+    const slider = container.querySelector<HTMLDivElement>(".flex");
+    if (!slider) return;
 
-    // Efek "tarikan elastis" saat di batas kanan (geser ke kanan melewati awal)
+    const slideItems = container.querySelectorAll<HTMLDivElement>(".slide-item");
+    if (slideItems.length === 0) {
+      pendingTranslateX = 0;
+      return;
+    }
+
+    const firstSlide = slideItems[0];
+    const lastSlide = slideItems[images.length - 1];
+
+    if (!firstSlide || !lastSlide) return;
+
+    const totalContentWidth = lastSlide.offsetLeft + lastSlide.clientWidth;
+    const maxScrollLeft = totalContentWidth - container.clientWidth; // Gunakan container.clientWidth untuk lebar wadah
+
+    // Batasan untuk newTranslateX
     if (newTranslateX > 0) {
-      newTranslateX = newTranslateX * 0.3; // Lebih sedikit dari 1.0 agar terasa elastis
-    }
-    // Efek "tarikan elastis" saat di batas kiri (geser ke kiri melewati akhir)
-    else if (newTranslateX < minAllowedTranslateX) {
-      newTranslateX =
-        minAllowedTranslateX + (newTranslateX - minAllowedTranslateX) * 0.3;
+      newTranslateX = newTranslateX * 0.3; // Efek "tarikan elastis" di batas kanan
+    } else if (newTranslateX < -maxScrollLeft && maxScrollLeft > 0) { // Pastikan maxScrollLeft positif
+      newTranslateX = -maxScrollLeft + (newTranslateX - (-maxScrollLeft)) * 0.3; // Efek "tarikan elastis" di batas kiri
+    } else if (maxScrollLeft <= 0) { // Jika semua konten muat dalam container, tidak perlu geser
+        newTranslateX = 0;
     }
 
-    translateX = newTranslateX;
+
+    pendingTranslateX = newTranslateX;
+
+    // Hanya minta frame baru jika belum ada yang tertunda
+    if (!animationFrameId) {
+      animationFrameId = requestAnimationFrame(updateGalleryPosition);
+    }
+  }
+
+  /**
+   * Fungsi yang dipanggil oleh requestAnimationFrame untuk memperbarui translateX.
+   */
+  function updateGalleryPosition(): void {
+    translateX = pendingTranslateX;
+    animationFrameId = null; // Reset ID agar frame berikutnya bisa diminta
   }
 
   /**
@@ -254,6 +287,12 @@
     if (!isDragging) return;
     isDragging = false;
 
+    // Batalkan setiap requestAnimationFrame yang tertunda karena drag sudah selesai
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+
     const deltaX = event.changedTouches[0].clientX - startX; // Total pergeseran dari awal sentuhan
 
     // Kembalikan transisi CSS
@@ -264,12 +303,41 @@
 
     // Tentukan slide yang akan dituju setelah drag berakhir
     let targetIndex = activeIndex;
-    if (deltaX < -swipeThreshold && activeIndex < images.length - 1) {
-      // Geser ke kiri (gambar berikutnya)
-      targetIndex++;
-    } else if (deltaX > swipeThreshold && activeIndex > 0) {
-      // Geser ke kanan (gambar sebelumnya)
-      targetIndex--;
+
+    if (Math.abs(deltaX) > swipeThreshold) {
+      if (deltaX < 0 && activeIndex < images.length - 1) {
+        // Geser ke kiri (gambar berikutnya)
+        targetIndex++;
+      } else if (deltaX > 0 && activeIndex > 0) {
+        // Geser ke kanan (gambar sebelumnya)
+        targetIndex--;
+      }
+    } else {
+      // Jika pergeseran tidak signifikan, cari slide terdekat dari posisi saat ini
+      const slideItems = container.querySelectorAll<HTMLDivElement>(".slide-item");
+      if (slideItems.length === 0) return;
+
+      const currentOffset = translateX; // Posisi saat ini
+
+      let closestIndex = 0;
+      let minDistance = Infinity;
+
+      for (let i = 0; i < slideItems.length; i++) {
+        const slideElement = slideItems[i];
+        const slideCenterInFlex = slideElement.offsetLeft + slideElement.clientWidth / 2;
+        const containerCenter = container.clientWidth / 2;
+
+        // Posisi translateX yang ideal untuk memusatkan slide ini
+        const idealTranslateX = containerCenter - slideCenterInFlex;
+
+        const distance = Math.abs(currentOffset - idealTranslateX);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = i;
+        }
+      }
+      targetIndex = closestIndex;
     }
 
     // Pindah ke slide target atau kembali ke slide aktif jika tidak ada pergeseran signifikan
@@ -358,6 +426,7 @@
       if (rsvpForm) {
         rsvpForm.removeEventListener("submit", handleSubmit);
       }
+      if (animationFrameId) cancelAnimationFrame(animationFrameId); // Penting: bersihkan requestAnimationFrame
     };
   });
 </script>
@@ -939,21 +1008,4 @@
   .slide-item:last-child {
     margin-right: 0;
   }
-
-  /* Kelas kustom untuk gambar yang tidak aktif */
-  /* Ini menggantikan bagian TailwindCSS di `img` jika Anda ingin lebih banyak kontrol */
-  /* .slide-item img:not(.active) { */
-  /* opacity: 0; /* <-- Pastikan ini 0 untuk menyembunyikan sepenuhnya */
-  /* filter: blur(8px) brightness(50%); */
-  /* width: 200px; */
-  /* height: 350px; */
-  /* } */
-
-  /* .slide-item img.active { */
-  /* opacity: 1; */
-  /* filter: none; */
-  /* width: 300px; */
-  /* height: 500px; */
-  /* z-index: 10; */
-  /* } */
 </style>
