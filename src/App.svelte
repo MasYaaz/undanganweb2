@@ -16,6 +16,8 @@
     faPaperPlane,
     faPlaceOfWorship,
   } from "@fortawesome/free-solid-svg-icons";
+  import Hero from "./lib/Hero.svelte";
+  import RSVPForm from "./lib/RSVPForm.svelte";
 
   // --- Variabel State Reaktif ---
   let targetSection: HTMLDivElement;
@@ -36,6 +38,7 @@
     "./images/galeri/foto4.webp",
     "./images/galeri/foto5.webp",
   ];
+
   let activeIndex: number = 0; // Mengindikasikan indeks gambar yang sedang ditampilkan di galeri (0 = gambar pertama).
   let container: HTMLDivElement; // Referensi ke elemen div utama yang membungkus semua slide galeri.
   let containerWidth: number = 800; // Lebar wadah galeri dalam piksel.
@@ -238,7 +241,8 @@
     const slider = container.querySelector<HTMLDivElement>(".flex");
     if (!slider) return;
 
-    const slideItems = container.querySelectorAll<HTMLDivElement>(".slide-item");
+    const slideItems =
+      container.querySelectorAll<HTMLDivElement>(".slide-item");
     if (slideItems.length === 0) {
       pendingTranslateX = 0;
       return;
@@ -255,12 +259,13 @@
     // Batasan untuk newTranslateX
     if (newTranslateX > 0) {
       newTranslateX = newTranslateX * 0.3; // Efek "tarikan elastis" di batas kanan
-    } else if (newTranslateX < -maxScrollLeft && maxScrollLeft > 0) { // Pastikan maxScrollLeft positif
-      newTranslateX = -maxScrollLeft + (newTranslateX - (-maxScrollLeft)) * 0.3; // Efek "tarikan elastis" di batas kiri
-    } else if (maxScrollLeft <= 0) { // Jika semua konten muat dalam container, tidak perlu geser
-        newTranslateX = 0;
+    } else if (newTranslateX < -maxScrollLeft && maxScrollLeft > 0) {
+      // Pastikan maxScrollLeft positif
+      newTranslateX = -maxScrollLeft + (newTranslateX - -maxScrollLeft) * 0.3; // Efek "tarikan elastis" di batas kiri
+    } else if (maxScrollLeft <= 0) {
+      // Jika semua konten muat dalam container, tidak perlu geser
+      newTranslateX = 0;
     }
-
 
     pendingTranslateX = newTranslateX;
 
@@ -314,7 +319,8 @@
       }
     } else {
       // Jika pergeseran tidak signifikan, cari slide terdekat dari posisi saat ini
-      const slideItems = container.querySelectorAll<HTMLDivElement>(".slide-item");
+      const slideItems =
+        container.querySelectorAll<HTMLDivElement>(".slide-item");
       if (slideItems.length === 0) return;
 
       const currentOffset = translateX; // Posisi saat ini
@@ -324,7 +330,8 @@
 
       for (let i = 0; i < slideItems.length; i++) {
         const slideElement = slideItems[i];
-        const slideCenterInFlex = slideElement.offsetLeft + slideElement.clientWidth / 2;
+        const slideCenterInFlex =
+          slideElement.offsetLeft + slideElement.clientWidth / 2;
         const containerCenter = container.clientWidth / 2;
 
         // Posisi translateX yang ideal untuk memusatkan slide ini
@@ -373,7 +380,7 @@
           }
         });
       },
-      options
+      options,
     );
 
     sections.forEach((id: string) => {
@@ -433,55 +440,7 @@
 
 <main>
   <!-- SECTION 1: Hero dengan Countdown dan Tombol Scroll -->
-  {#if showHero}
-    <section
-      id="section1"
-      style="background-image: url('./images/back1.webp'); background-size: cover; background-position: center;"
-      class="section-hero fixed inset-0 z-50 flex flex-col items-center justify-center px-4 text-center transition-transform duration-1000 ease-in-out');"
-      class:hidden-slide={hasEntered}
-    >
-      <!-- Overlay semi-transparan -->
-      <div class="absolute inset-0 bg-white/60 backdrop-blur-sm"></div>
-
-      <!-- Konten utama -->
-      <div class="relative z-10 flex flex-col items-center">
-        <h3
-          class="font-jane mt-5 mb-0 text-lg font-medium text-black md:mb-3 md:text-3xl"
-        >
-          - Wedding Invitation -
-        </h3>
-
-        <h2
-          class="font-cinzeldeco mt-0 text-4xl font-[600] tracking-widest text-pink-700 drop-shadow md:mt-3 md:text-8xl"
-        >
-          MuhammaD
-        </h2>
-        <h2
-          class="font-cinzeldeco mt-0 mb-5 text-3xl font-[600] tracking-widest text-pink-700 drop-shadow md:text-7xl"
-        >
-          & aishaH
-        </h2>
-
-        <img
-          loading="eager"
-          width="600"
-          height="80"
-          src="./images/place1.webp"
-          alt="ornamen dekorasi"
-          class="mb-50 h-auto w-60 md:w-150"
-        />
-
-        <!-- Tombol -->
-        <button
-          class="font-primary mt-10 flex w-fit items-center gap-2 rounded-full bg-pink-500 px-6 py-3 font-semibold text-white transition duration-300 hover:bg-pink-600 hover:cursor-pointer"
-          on:click={enterInvitation}
-        >
-          Lihat Undangan
-          <FontAwesomeIcon icon={faEnvelopeOpen} class="animate-bounce" />
-        </button>
-      </div>
-    </section>
-  {/if}
+  <Hero {showHero} {hasEntered} onEnter={enterInvitation} />
   <!-- NAVBAR -->
 
   <Navbar show={hasEntered} />
@@ -662,13 +621,27 @@
 
     <!-- Section 4 sampai 6 -->
     <div
-      class="relative"
+      class="relative overflow-hidden"
       style="background-image: url('./images/back2.webp'); background-size: cover; background-position: center;"
     >
       <!-- Overlay semi-transparan -->
       <div
         class="absolute inset-0 z-0 bg-gradient-to-t from-white/20 via-white/30 to-white/100"
       ></div>
+      <div
+        class="absolute hidden inset-0 z-0 opacity-10 md:flex justify-between px-20"
+      >
+        <img
+          src="./images/place1.webp"
+          alt="ornamen"
+          class="lg:h-60 w-auto rotate-90"
+        />
+        <img
+          src="./images/place1.webp"
+          alt="ornamen"
+          class="h-60 w-auto -rotate-90"
+        />
+      </div>
       <!-- SECTION 4 -->
       <section
         id="section4"
@@ -789,137 +762,8 @@
         </div>
       </section>
 
-      <!-- SECTION 6 -->
-      <section
-        id="section6"
-        class="relative flex min-h-screen items-center justify-center px-4 py-12"
-      >
-        <div
-          class="w-full flex flex-col max-w-2xl rounded-3xl bg-white/30 p-8 shadow-lg backdrop-blur-sm"
-        >
-          <div class="mb-6 text-center">
-            <h2
-              class="font-poppins uppercase text-7xl font-bold text-pink-700 lg:text-8xl"
-            >
-              rsvp
-            </h2>
-            <p class="font-poppins text-[12px] text-black lg:text-base">
-              Silahkan isi konfirmasi kehadiran anda.
-            </p>
-          </div>
-
-          <form
-            method="POST"
-            action="https://script.google.com/macros/s/AKfycbxQeSggLMDWB0lx_gE-p6XLetYiIltGw7hsBO-pH_me5EdRxKinD4m8TRmFEl36IsXn/exec"
-            class="space-y-6 flex flex-col"
-            id="RSVP"
-          >
-            <!-- Input Nama -->
-            <div>
-              <label
-                for="nama"
-                class="block text-sm font-medium text-gray-700 font-poppins"
-                >Nama</label
-              >
-              <input
-                type="text"
-                id="nama"
-                name="Nama"
-                class="mt-1 w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none font-poppins"
-                placeholder="Masukkan nama Anda"
-              />
-            </div>
-            <!-- Input Kehadiran -->
-            <div>
-              <p
-                class="mb-2 block text-sm font-medium text-gray-700 font-poppins"
-              >
-                Apakah Anda akan hadir?
-              </p>
-              <div class="flex items-center space-x-6">
-                <label
-                  class="radio-wrapper hover:scale-102 transition-transform"
-                >
-                  <input
-                    type="radio"
-                    name="Kehadiran"
-                    value="Ya"
-                    class="custom-radio"
-                    bind:group={selected}
-                  />
-                  <span class="icon-wrapper">
-                    <FontAwesomeIcon icon={faCheck} />
-                  </span>
-                  <span class="ml-2 text-gray-700 font-poppins"
-                    >Ya, saya akan hadir</span
-                  >
-                </label>
-                <label
-                  class="radio-wrapper hover:scale-102 transition-transform"
-                >
-                  <input
-                    type="radio"
-                    name="Kehadiran"
-                    value="Tidak"
-                    class="custom-radio"
-                    bind:group={selected}
-                  />
-                  <span class="icon-wrapper">
-                    <FontAwesomeIcon icon={faCheck} />
-                  </span>
-                  <span class="ml-2 text-gray-700 font-poppins"
-                    >Maaf, saya tidak bisa hadir</span
-                  >
-                </label>
-              </div>
-            </div>
-            <!-- Input Jumlah Hadirin -->
-            <div>
-              <label
-                for="Jumlah Hadirin"
-                class="block text-sm font-medium text-gray-700"
-                >Jumlah Hadirin</label
-              >
-              <input
-                type="number"
-                id="Jumlah Hadirin"
-                name="Jumlah Hadirin"
-                min="1"
-                max="10"
-                class="mt-1 w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none"
-                placeholder="Masukkan jumlah yang akan hadir"
-              />
-            </div>
-            <!-- Input Pesan dan Doa -->
-            <div>
-              <label
-                for="Ucapan / Doa"
-                class="block text-sm font-medium text-gray-700"
-                >Ucapan / Doa</label
-              >
-              <textarea
-                id="Ucapan / Doa"
-                name="Ucapan / Doa"
-                rows="4"
-                class="mt-1 w-full rounded-xl border border-gray-300 p-3 shadow-sm focus:border-pink-500 focus:ring-1 focus:ring-pink-500 focus:outline-none"
-                placeholder="Tuliskan ucapan atau doa Anda di sini..."
-              ></textarea>
-            </div>
-
-            <div class="text-center flex justify-center">
-              <button
-                type="submit"
-                class="gap-2 w-content rounded-full flex items-center justify-center bg-pink-600 px-8 py-3 text-white shadow-md transition-transform hover:scale-105 hover:cursor-pointer hover:bg-pink-700 focus:outline-none"
-              >
-                Kirim <FontAwesomeIcon
-                  icon={faPaperPlane}
-                  class="fa-md rotate-12"
-                />
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>
+      <!-- RSVP Form -->
+      <RSVPForm />
     </div>
   </div>
 </main>
@@ -950,11 +794,6 @@
     height: 20px;
     position: relative;
     cursor: pointer;
-  }
-
-  .custom-radio:checked + .icon-wrapper {
-    visibility: visible;
-    color: red;
   }
 
   .icon-wrapper {
