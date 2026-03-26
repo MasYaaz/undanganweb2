@@ -1,7 +1,7 @@
 <script lang="ts">
   import { FontAwesomeIcon } from "@fortawesome/svelte-fontawesome";
-  import Countdown from "../Countdown.svelte";
-  import Flipcard from "../Flipcard.svelte";
+  import Countdown from "../Component/Countdown.svelte";
+  import Flipcard from "../Component/Flipcard.svelte";
   import { faCalendarAlt } from "@fortawesome/free-regular-svg-icons";
   import {
     faMosque,
@@ -45,8 +45,10 @@
   id="section4"
   class="relative flex min-h-screen items-center justify-center bg-gradient-to-br p-15 px-4"
 >
-  <div class="relative flex flex-col justify-center z-10 lg:pt-10 text-center">
-    <FontAwesomeIcon icon={faCalendarAlt} size="5x" class="fa-5x mb-5" />
+  <div
+    class="relative flex flex-col items-center justify-center z-10 lg:pt-10 text-center"
+  >
+    <FontAwesomeIcon icon={faCalendarAlt} size="8x" class="mb-5" />
     <div class="lg:mb-20">
       <h2 class="font-cinzeldeco text-2xl font-semibold lg:mb-2 lg:text-5xl">
         Rangkaian acara

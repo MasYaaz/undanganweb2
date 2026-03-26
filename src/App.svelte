@@ -1,7 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import Navbar from "./lib/Navbar.svelte";
-  import MusicPlayer from "./lib/MusicPlayer.svelte";
   import "./app.css";
 
   import Hero from "./lib/SectionUndangan/Hero.svelte";
@@ -10,6 +8,8 @@
   import Story from "./lib/SectionUndangan/Story.svelte";
   import EventDetail from "./lib/SectionUndangan/EventDetail.svelte";
   import Gallery from "./lib/SectionUndangan/Gallery.svelte";
+  import Navbar from "./lib/Component/Navbar.svelte";
+  import MusicPlayer from "./lib/Component/MusicPlayer.svelte";
 
   // --- Variabel State Reaktif ---
   let targetSection: HTMLDivElement;
