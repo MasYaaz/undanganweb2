@@ -1,24 +1,30 @@
 <script lang="ts">
-  import { faVolumeHigh, faVolumeMute } from "@fortawesome/free-solid-svg-icons";
+  import {
+    faVolumeHigh,
+    faVolumeMute,
+  } from "@fortawesome/free-solid-svg-icons";
   import { FontAwesomeIcon } from "@fortawesome/svelte-fontawesome";
-  import { afterUpdate } from "svelte";
 
-  let isPlaying = false;
-  export let show: boolean = false;
-  let audioRef: HTMLAudioElement;
+  let isPlaying = $state(false);
+  let hasTriedAutoplay = $state(false);
+
+  let { show = false } = $props<{ show?: boolean }>();
+  let audioRef = $state<HTMLAudioElement | null>(null);
 
   // Coba autoplay hanya sekali saat `show` pertama kali true
-  let hasTriedAutoplay = false;
 
-  afterUpdate(() => {
+  $effect(() => {
+    // Svelte 5 akan otomatis melacak perubahan pada 'show' dan 'audioRef'
     if (show && audioRef && !isPlaying && !hasTriedAutoplay) {
-      audioRef.play()
+      audioRef
+        .play()
         .then(() => {
           isPlaying = true;
           hasTriedAutoplay = true;
         })
         .catch((e) => {
           console.warn("Autoplay blocked:", e);
+          // Tetap set true agar tidak terus-menerus mencoba (loop) saat gagal
           hasTriedAutoplay = true;
         });
     }
@@ -30,7 +36,8 @@
       audioRef.pause();
       isPlaying = false;
     } else {
-      audioRef.play()
+      audioRef
+        .play()
         .then(() => {
           isPlaying = true;
         })
@@ -43,8 +50,8 @@
 
 {#if show}
   <button
-    class="fixed bottom-[13px] lg:bottom-2 left-3 lg:left-6 z-50 bg-pink-200 text-black rounded-[18px] p-2 lg:p-3 shadow-lg hover:bg-pink-100 transition hover:cursor-pointer duration-300 hover:scale-105 "
-    on:click={toggleMusic}
+    class="fixed bottom-[13px] lg:bottom-2 left-3 lg:left-6 z-50 bg-pink-200 text-black rounded-[18px] p-2 lg:p-3 shadow-lg hover:bg-pink-100 transition hover:cursor-pointer duration-300 hover:scale-105"
+    onclick={toggleMusic}
   >
     {#if isPlaying}
       <FontAwesomeIcon icon={faVolumeHigh} />

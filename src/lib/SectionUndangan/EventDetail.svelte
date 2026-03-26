@@ -1,17 +1,14 @@
 <script lang="ts">
   import { FontAwesomeIcon } from "@fortawesome/svelte-fontawesome";
+  import Countdown from "../Countdown.svelte";
+  import Flipcard from "../Flipcard.svelte";
+  import { faCalendarAlt } from "@fortawesome/free-regular-svg-icons";
   import {
-    faCalendarAlt,
     faMosque,
     faPlaceOfWorship,
   } from "@fortawesome/free-solid-svg-icons";
-  import Countdown from "./Countdown.svelte";
-  import Flipcard from "./Flipcard.svelte";
 
-  // Menerima props targetDate dari App.svelte
-  let { targetDate } = $props<{ targetDate: Date }>();
-
-  // Data Acara dimasukkan ke sini agar App.svelte ringkas
+  // --- Data Acara ---
   const eventCards = [
     {
       title: "Akad nikah",
@@ -39,56 +36,43 @@
       mapQuery: "Graha Adi",
     },
   ];
+
+  // --- Tanggal Target Hitung Mundur ---
+  const targetDate: Date = new Date("2025-06-15T10:00:00");
 </script>
 
 <section
   id="section4"
-  class="relative flex min-h-screen items-center justify-center bg-white px-4 py-20"
+  class="relative flex min-h-screen items-center justify-center bg-gradient-to-br p-15 px-4"
 >
-  <div class="relative z-10 flex flex-col items-center text-center">
-    <div class="mb-10 flex flex-col items-center">
-      <div
-        class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-pink-100 text-pink-600"
-      >
-        <FontAwesomeIcon icon={faCalendarAlt} class="text-4xl" />
-      </div>
-
-      <h2
-        class="font-cinzeldeco text-2xl font-semibold lg:text-5xl text-gray-800"
-      >
-        Rangkaian Acara
+  <div class="relative flex flex-col justify-center z-10 lg:pt-10 text-center">
+    <FontAwesomeIcon icon={faCalendarAlt} size="5x" class="fa-5x mb-5" />
+    <div class="lg:mb-20">
+      <h2 class="font-cinzeldeco text-2xl font-semibold lg:mb-2 lg:text-5xl">
+        Rangkaian acara
       </h2>
-      <h3
-        class="font-cinzeldeco mt-2 text-xl font-medium lg:text-3xl text-pink-700"
-      >
-        Diselenggarakan Pada
-      </h3>
+      <h2 class="font-cinzeldeco mb-5 text-xl font-semibold lg:text-4xl">
+        diselenggarakan Pada
+      </h2>
     </div>
-
-    <div class="mb-16">
+    <div class="lg:mb-10">
       <h3
-        class="font-poppins text-5xl font-bold tracking-[4px] uppercase lg:text-8xl text-gray-900"
+        class="font-poppins mb-1 text-5xl font-bold tracking-[3px] uppercase lg:text-8xl"
       >
         Sabtu
       </h3>
       <h3
-        class="font-poppins mt-2 text-2xl font-semibold tracking-[2px] lg:text-5xl text-pink-600"
+        class="font-poppins mb-5 text-2xl font-semibold tracking-[3px] lg:text-5xl"
       >
         15 Juni 2025
       </h3>
-
-      <div class="mt-8">
-        <Countdown {targetDate} />
-      </div>
+      <!-- Komponen Countdown -->
+      <Countdown {targetDate} />
     </div>
-
-    <h2
-      class="font-cinzeldeco mb-10 text-2xl font-semibold lg:text-4xl text-gray-800"
-    >
+    <h2 class="font-cinzeldeco mt-25 text-2xl font-semibold lg:text-5xl">
       Rincian Acara
     </h2>
-
-    <div class="flex flex-col gap-10 lg:flex-row lg:gap-16">
+    <div class="mt-5 flex flex-col gap-15 lg:mt-20 lg:flex-row">
       {#each eventCards as item}
         <Flipcard
           judulCinzel={item.title}
@@ -105,8 +89,3 @@
     </div>
   </div>
 </section>
-
-<style>
-  /* Tambahkan styling khusus jika diperlukan, 
-     sebagian besar sudah di-handle oleh Tailwind */
-</style>
