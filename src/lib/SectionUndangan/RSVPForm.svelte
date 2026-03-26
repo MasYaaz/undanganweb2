@@ -160,15 +160,16 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-500 {selectedPresence ===
         'Ya'
-          ? 'opacity-100 visible h-auto'
-          : 'opacity-0 invisible h-0'}"
+          ? 'opacity-100 visible h-auto mb-8'
+          : 'opacity-0 invisible h-0 mb-0 overflow-hidden'}"
       >
         <div>
           <label
             for="jumlah_rsvp"
             class="block text-sm font-medium text-pink-900 font-poppins mb-1.5 ml-1"
-            >Jumlah Hadirin (Maks. 2)</label
           >
+            Jumlah Hadirin (Maks. 2)
+          </label>
           <div class="relative">
             <FontAwesomeIcon
               icon={faUsers}
@@ -182,30 +183,30 @@
               max="2"
               placeholder="Jumlah pax"
               required={selectedPresence === "Ya"}
-              class="w-full rounded-2xl border border-gray-100 bg-white/60 p-4 pl-12 text-gray-800 shadow-inner placeholder:text-gray-300 focus:border-pink-300 focus:outline-none focus:bg-white transition-all duration-300"
+              class="w-full rounded-2xl border border-gray-100 bg-white/60 p-4 pl-12 text-gray-800 shadow-inner focus:border-pink-300 focus:outline-none focus:bg-white transition-all duration-300"
             />
           </div>
         </div>
-
-        <div class="md:col-span-2 relative">
-          <label
-            for="doa_rsvp"
-            class="block text-sm font-medium text-pink-900 font-poppins mb-1.5 ml-1"
-            >Ucapan & Doa</label
-          >
-          <div class="relative">
-            <FontAwesomeIcon
-              icon={faHeart}
-              class="absolute left-4 top-5 text-pink-300"
-            />
-            <textarea
-              id="doa_rsvp"
-              name="Pesan"
-              rows="4"
-              placeholder="Tuliskan doa terbaik Anda untuk mempelai..."
-              class="w-full rounded-2xl border border-gray-100 bg-white/60 p-4 pl-12 pt-4 text-gray-800 shadow-inner placeholder:text-gray-300 focus:border-pink-300 focus:outline-none focus:bg-white transition-all duration-300"
-            ></textarea>
-          </div>
+      </div>
+      <div class="relative w-full">
+        <label
+          for="doa_rsvp"
+          class="block text-sm font-medium text-pink-900 font-poppins mb-1.5 ml-1"
+        >
+          Ucapan & Doa
+        </label>
+        <div class="relative">
+          <FontAwesomeIcon
+            icon={faHeart}
+            class="absolute left-4 top-5 text-pink-300"
+          />
+          <textarea
+            id="doa_rsvp"
+            name="Pesan"
+            rows="4"
+            placeholder="Tuliskan doa terbaik Anda untuk mempelai..."
+            class="w-full rounded-2xl border border-gray-100 bg-white/60 p-4 pl-12 pt-4 text-gray-800 shadow-inner placeholder:text-gray-300 focus:border-pink-300 focus:outline-none focus:bg-white transition-all duration-300"
+          ></textarea>
         </div>
       </div>
 

@@ -379,46 +379,6 @@
     transform: translateY(-100%);
   }
 
-  /* Custom radio */
-  .radio-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    cursor: pointer;
-  }
-
-  .custom-radio {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 0px;
-    height: 20px;
-    position: relative;
-    cursor: pointer;
-  }
-
-  .icon-wrapper {
-    visibility: visible; /* sembunyikan tapi tetap ambil ruang */
-    color: grey;
-    font-size: 16px;
-    pointer-events: none;
-    width: 16px; /* atur lebar tetap */
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    margin-left: 0;
-  }
-
-  .icon {
-    position: absolute;
-    color: white;
-    font-size: 14px;
-    pointer-events: none;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
   /* Perbaikan dan penyesuaian CSS untuk galeri */
   /* Pastikan overflow: hidden ada pada container utama galeri */
   .gallery-container {

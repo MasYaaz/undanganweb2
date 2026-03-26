@@ -60,18 +60,7 @@
 
 {#if show}
   <nav
-    class="fixed top-0 z-50 w-full bg-white/40 shadow-sm backdrop-blur-md px-6 py-3 flex justify-center transition-all duration-500"
-    style="transform: {show ? 'translateY(0)' : 'translateY(-100%)'}"
-  >
-    <h1
-      class="text-sm md:text-lg font-cinzeldeco uppercase font-bold text-pink-700 flex items-center gap-2"
-    >
-      <FontAwesomeIcon icon={faEnvelopeOpen} /> Muhammad & Aishah
-    </h1>
-  </nav>
-
-  <nav
-    class="fixed bottom-0 z-50 w-full bg-white/60 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] backdrop-blur-lg flex justify-center border-t border-pink-100"
+    class="fixed bottom-0 z-50 w-full bg-white/80 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] backdrop-blur-sm flex justify-center border-t border-pink-100"
   >
     <ul class="flex w-full max-w-lg justify-around items-center px-2 py-2">
       {#each navItems as { id, icons, label }}
@@ -84,7 +73,7 @@
           >
             {#if activeSection === id}
               <div
-                class="absolute -top-1 w-1 h-1 bg-pink-600 rounded-full animate-pulse"
+                class="absolute bottom-1 w-full h-0.5 lg:h-1 bg-pink-600 rounded-full animate-pulse"
               ></div>
             {/if}
 

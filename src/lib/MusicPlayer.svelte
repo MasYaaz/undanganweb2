@@ -50,7 +50,7 @@
 
 {#if show}
   <button
-    class="fixed bottom-[13px] lg:bottom-2 left-3 lg:left-6 z-50 bg-pink-200 text-black rounded-[18px] p-2 lg:p-3 shadow-lg hover:bg-pink-100 transition hover:cursor-pointer duration-300 hover:scale-105"
+    class="fixed top-4 right-4 z-50 bg-black text-pink-200 rounded-full h-10 w-10 shadow-lg hover:bg-gray-900 transition hover:cursor-pointer duration-300 hover:scale-105"
     onclick={toggleMusic}
   >
     {#if isPlaying}
